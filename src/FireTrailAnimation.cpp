@@ -43,7 +43,7 @@ void FireTrailAnimation::update(sf::Time dt) {
 
         if (!m_loopMode) {
             m_currentFrame++;
-            if (m_currentFrame >= 4) {
+            if (m_currentFrame >= 4) { //git check
                 m_currentFrame = 4;
                 m_loopMode = true;
             }
