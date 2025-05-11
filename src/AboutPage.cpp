@@ -1,11 +1,11 @@
 #include "AboutPage.hpp"
 
 AboutPage::AboutPage(sf::RenderWindow& window):
-    m_backToMenu(false), 
     m_hoverBack(false),
     m_font(ResourcesManager::get().getFont("main")),
     m_aboutBGSprite(ResourcesManager::get().getTexture("about_bg_pic"))
 {
+    //m_backToMenu = false;
     //scaling bg to window size
     sf::Vector2f scale = { static_cast<float>(window.getSize().x) / static_cast<float>(m_aboutBGSprite.getTexture().getSize().x),
         static_cast<float>(window.getSize().y) / static_cast<float>(m_aboutBGSprite.getTexture().getSize().y) };
@@ -88,11 +88,6 @@ void AboutPage::draw(sf::RenderWindow& window)
     window.draw(m_aboutBGSprite);
     for (const auto& text : m_AboutPageList)
         window.draw(text);
-}
-
-bool AboutPage::wantsToReturn() const
-{
-    return m_backToMenu;
 }
 
 void AboutPage::resetAboutPage()

@@ -10,8 +10,11 @@
 GamePlayPage::GamePlayPage(sf::RenderWindow& window) :
     m_board(window.getSize()),
     m_currentPiece(spawnRandomPattern()),
-    m_fireTrail(std::make_unique<FireTrailAnimation>())
+    m_fireTrail(std::make_unique<FireTrailAnimation>()),
+    m_gameOver(false),
+    m_downHeld(false)
 {
+    //m_backToMenu = false;
     m_gravity.start(1.f);   // Initial delay of 1 second
 }
 
@@ -48,6 +51,11 @@ void GamePlayPage::handleEvent(const sf::Event& event, const sf::RenderWindow& w
 
 void GamePlayPage::draw(sf::RenderWindow& window)
 {
+    if (m_gameOver) {
+        m_board.draw(window, 100); // oppacity alpha is 100 out of 255
+        drawGameOverText(window);             // draws centered PNG
+        return;
+    }
     // Push shake offset
     sf::View view = window.getView();
     sf::Vector2f shakeOffset = m_shake.getShakeOffset();
@@ -60,7 +68,9 @@ void GamePlayPage::draw(sf::RenderWindow& window)
         m_fireTrail->draw(window, m_board.getBlockSize(), m_board.getOffset());
     if (m_currentPiece)
         m_currentPiece->draw(window, m_board);
-    
+    if (m_currentPiece)
+        m_currentPiece->drawGhost(window, m_board, getComputedGhostPivotPiece());
+
 
     // Draw explosion animation
     //m_lineClearAnimation.draw(window, m_board.getBlockSize(), m_board.getOffset()); //*
@@ -79,127 +89,175 @@ CubePattern* GamePlayPage::getCurrentActivePiece() const
     return m_currentPiece.get();
 }
 
-void GamePlayPage::update()
+void GamePlayPage::clear()
 {
-    m_shake.update(sf::seconds(1.f / 60.f));  // ~60FPS
+    // Clear grid to reuse
+    m_board.clear();
+    // Reset gameplay state
+    m_currentPiece = spawnRandomPattern();
+    m_gravity.start(1.f);
 
-    // Always update all animations
-    for (auto it = m_animations.begin(); it != m_animations.end(); ) {
-        (*it)->update(sf::seconds(1.f / 60.f)); // ~60FPS
-        if ((*it)->isFinished()) {
-            it = m_animations.erase(it);
-        }
-        else {
-            ++it;
-        }
-    }
+    m_animations.clear();
+    m_pendingClearLines.clear();
 
-    // Wait until ALL animations are done before proceeding
-    if (!m_animations.empty())
+    m_downHeld = false;
+    m_gameOver = false;
+    m_gameOverDelay.reset();
+
+    m_backToMenu = false;
+}
+
+void GamePlayPage::update(const sf::Time deltaTime)
+{
+    if (m_gameOver) {
+        if (m_gameOverDelay.isDone()) {
+            m_backToMenu = true;
+        }
         return;
-
-    // If animation finished and pending clear exists, now clear
-    if (!m_pendingClearLines.empty()) {
-        // Clear the rows visually (make them '_')
-        m_board.clearLinesFromGrid(m_pendingClearLines);
-
-        // Collapse everything above them
-        m_board.collapseLines(m_pendingClearLines);
-        m_board.debugPrint();
-        m_pendingClearLines.clear();
-
-        // Spawn new piece
-        m_currentPiece = spawnRandomPattern();
-        m_gravity.speedUp();
-        return; // After clearing, skip moving down
     }
+    //const sf::Time deltaTime = sf::seconds(1.f / 60.f); // Target frame time (~60 FPS)
 
-    // Normal gameplay (gravity move down)
+    m_shake.update(deltaTime);
+    updateAnimations(deltaTime);
+
+    if (!m_animations.empty())
+        return; // Wait for all animations to complete
+
+    if (handlePendingLineClears())
+        return; // Skip gravity if lines were just cleared
+
     if (!m_currentPiece)
         return;
 
-    if (m_gravity.shouldFall()) {
-        sf::Vector2i next = m_currentPiece->getPivot() + sf::Vector2i(0, 1);
-        auto nextPositions = m_currentPiece->getPatternPositions(next);
+    handleGravity();
 
-        if (!m_board.checkCollision(nextPositions)) {
-            m_currentPiece->moveDown(m_board);
+    updateFireTrail(deltaTime);
+}
+
+void GamePlayPage::updateAnimations(sf::Time dt)
+{
+    for (auto it = m_animations.begin(); it != m_animations.end(); ) {
+        (*it)->update(dt);
+        if ((*it)->isFinished())
+            it = m_animations.erase(it);
+        else
+            ++it;
+    }
+}
+
+bool GamePlayPage::handlePendingLineClears()
+{
+    if (m_pendingClearLines.empty())
+        return false;
+
+    m_board.clearLinesFromGrid(m_pendingClearLines);
+    m_board.collapseLines(m_pendingClearLines);
+    m_board.debugPrint();
+    m_pendingClearLines.clear();
+
+    m_currentPiece = spawnRandomPattern();
+    m_gravity.speedUp();
+    return true;
+}
+
+void GamePlayPage::handleGravity()
+{
+    if (!m_gravity.shouldFall())
+        return;
+
+    sf::Vector2i next = m_currentPiece->getPivot() + sf::Vector2i(0, 1);
+    auto nextPositions = m_currentPiece->getPatternPositions(next);
+
+    if (!m_board.checkCollision(nextPositions)) {
+        m_currentPiece->moveDown(m_board);
+    }
+    else {
+        if (m_fireTrail) m_fireTrail->stop();
+
+        ResourcesManager::get().getSound("lock_piece").play();
+        auto affectedRows = m_board.lockPiece(*m_currentPiece);
+        auto fullLines = m_board.findFullLines(affectedRows);
+
+        if (!fullLines.empty()) {
+            m_board.clearLinesFromGrid(fullLines);
+            m_shake.start(fullLines.size() /** 2.f*/, fullLines.size() /** 5.f*/); //?
+
+            auto explosionAnim = std::make_unique<LineClearAnimation>();
+            explosionAnim->start(fullLines);
+            m_animations.push_back(std::move(explosionAnim));
+
+            m_pendingClearLines = fullLines;
+            m_currentPiece.reset(); // Wait for clear to spawn new one
         }
         else {
-            if (m_fireTrail) 
-                m_fireTrail->stop();
-
-            ResourcesManager::get().getSound("lock_piece").play();
-            auto affectedRows = m_board.lockPiece(*m_currentPiece);
-            auto fullLines = m_board.findFullLines(affectedRows);
-
-            if (!fullLines.empty()) {
-                m_board.clearLinesFromGrid(fullLines);
-                m_shake.start(fullLines.size() * 2.f, fullLines.size() * 5.f);  // Shake for 2 seconds with strength 5 pixels (each * how many cleared lines)
-                //m_lineClearAnimation.start(fullLines); //*check*
-                // Start animations:
-                auto explosionAnim = std::make_unique<LineClearAnimation>();
-                explosionAnim->start(fullLines);
-                m_animations.push_back(std::move(explosionAnim));
-
-                m_pendingClearLines = fullLines;
-                m_currentPiece.reset(); // No current piece until lines are cleared
+            m_currentPiece = spawnRandomPattern();
+            if (isGameOver()){
+                //m_backToMenu = true;
+                m_currentPiece.reset();
             }
-            else {
-                m_currentPiece = spawnRandomPattern();
-                m_gravity.speedUp();
-            }
-        }
-
-        m_gravity.reset();
-    }
-
-    // Update fire trail position under falling piece
-    /*if (m_downHeld && m_currentPiece) {
-        sf::Vector2i pivot = m_currentPiece->getPivot();
-        float blockSize = m_board.getBlockSize();
-        sf::Vector2f offset = m_board.getOffset();
-
-        sf::Vector2f worldPos;
-        worldPos.x = offset.x + pivot.x * blockSize - blockSize / 2.f;
-        worldPos.y = offset.y + pivot.y * blockSize + blockSize * 0.5f; // Slightly below center
-        if(m_fireTrail)
-        if (m_fireTrail) {
-            m_fireTrail->start(worldPos); // Continuously resets position
-        }
-    }*/
-    if (m_downHeld && m_currentPiece) {
-        const auto& blocks = m_currentPiece->getPatternPositions(m_currentPiece->getPivot());
-
-        if (!blocks.empty()) {
-            float blockSize = m_board.getBlockSize();
-            sf::Vector2f offset = m_board.getOffset();
-
-            // Compute average X and max Y of current piece
-            float avgCol = 0.f;
-            int maxRow = 0;
-            for (const auto& b : blocks) {
-                avgCol += b.x;
-                if (b.y > maxRow)
-                    maxRow = b.y;
-            }
-            avgCol /= blocks.size();
-
-            sf::Vector2f worldPos;
-            worldPos.x = offset.x + avgCol * blockSize;
-            worldPos.y = offset.y + maxRow * blockSize + blockSize * 0.5f;
-
-            if (m_fireTrail) {
-                m_fireTrail->start(worldPos);
-            }
+            m_gravity.speedUp();
         }
     }
 
-    if (m_fireTrail) m_fireTrail->update(sf::seconds(1.f / 60.f));
-    /*if (m_downHeld && m_fireTrail) {
-        std::cout << "Fire Trail Active\n";
-    }*/
+    m_gravity.reset();
 }
+
+void GamePlayPage::updateFireTrail(sf::Time dt)
+{
+    if (!m_downHeld || !m_currentPiece || !m_fireTrail)
+        return;
+
+    const auto& blocks = m_currentPiece->getPatternPositions(m_currentPiece->getPivot());
+    if (blocks.empty()) return;
+
+    // Compute average X (horizontal center) and max Y (bottom-most row)
+    float avgCol = 0.f;
+    int maxRow = 0;
+    for (const auto& b : blocks) {
+        avgCol += b.x;
+        if (b.y > maxRow)
+            maxRow = b.y;
+    }
+    avgCol /= blocks.size();
+
+    float blockSize = m_board.getBlockSize();
+    sf::Vector2f offset = m_board.getOffset();
+
+    sf::Vector2f worldPos;
+    worldPos.x = offset.x + avgCol * blockSize;
+    worldPos.y = offset.y + (maxRow + 1) * blockSize;
+
+    m_fireTrail->start(worldPos);
+    m_fireTrail->update(dt);
+}
+
+bool GamePlayPage::isGameOver()
+{
+    const auto& newPieceCheck = m_currentPiece.get()->getPatternPositions(m_currentPiece.get()->getPivot());
+    for (const auto& piv : newPieceCheck) {
+        std::cout << piv.y << " " << piv.x << std::endl;
+        if (m_board.getCell(piv.y, piv.x) != '_') {
+            m_gameOver = true;
+            m_gameOverDelay.start(3.0f); // delay before switching page to menu 
+            break;
+        }
+    }
+    return m_gameOver;
+}
+
+// Compute ghost pivot
+sf::Vector2i GamePlayPage::getComputedGhostPivotPiece()
+{
+    sf::Vector2i ghostPivot = m_currentPiece->getPivot();
+    while (true) {
+        auto next = m_currentPiece->getPatternPositions(ghostPivot + sf::Vector2i(0, 1)); // One more step down untill colision found
+        if (!m_board.checkCollision(next))
+            ghostPivot.y += 1; // Moving ghost forward
+        else // Collision found
+            break; 
+    }
+    return ghostPivot;
+}//git check
 
 
 std::unique_ptr<CubePattern> GamePlayPage::spawnRandomPattern()
@@ -226,4 +284,17 @@ std::unique_ptr<CubePattern> GamePlayPage::spawnRandomPattern()
     }
 }
 
-
+void GamePlayPage::drawGameOverText(sf::RenderWindow& window) {
+    sf::Sprite sprite(ResourcesManager::get().getTexture("game_over_pic"));
+    auto GOFrame = sf::IntRect(sf::Vector2i(77, 0), sf::Vector2i(226, 62));
+    sprite.setTextureRect(GOFrame);
+    sprite.setScale(sf::Vector2f(1.5f, 1.5f)); // adjust
+    sf::FloatRect bounds = sprite.getGlobalBounds();
+    sprite.setPosition(
+        sf::Vector2f(
+        window.getSize().x / 2.f - bounds.size.x / 2.f,
+        window.getSize().y / 3.f - bounds.size.y / 2.f
+        )
+    );
+    window.draw(sprite);
+}

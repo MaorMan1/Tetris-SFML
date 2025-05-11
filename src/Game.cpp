@@ -18,6 +18,7 @@ void Game::run()
 
     m_currentPage = m_menu.get();
 
+    sf::Clock mainClock;
     // Start the game loop
     while (window.isOpen())
     {
@@ -33,8 +34,10 @@ void Game::run()
         }
         if (isDelayedHandle(window)) 
             continue;
+        // Take the passed loop time for delta time
+        sf::Time deltaTime = mainClock.restart();
         // Page case
-        handlePageSwitching(window);
+        handlePageSwitching(window, deltaTime);
 
         window.clear();
         m_currentPage->draw(window);
@@ -42,7 +45,7 @@ void Game::run()
     }
 }
 
-void Game::handlePageSwitching(sf::RenderWindow& window)
+void Game::handlePageSwitching(sf::RenderWindow& window, const sf::Time deltaTime)
 {
     auto& pageSwitchSound = ResourcesManager::get().getSound("page_transition");
     
@@ -68,15 +71,22 @@ void Game::handlePageSwitching(sf::RenderWindow& window)
         }
     }
     else if (AboutPage* about = dynamic_cast<AboutPage*>(m_currentPage)) {
-        if (about->wantsToReturn()) { // Back button clicked
-            m_menu->resetSelection();
-            m_currentPage = m_menu.get();
-            m_about.get()->resetAboutPage();
+        if (about->wantsToReturn()) { // Back button clicked            
+            goBackToMenuProcedure();
             pageSwitchSound.play();
         }
     }
     else if(GamePlayPage* gp = dynamic_cast<GamePlayPage*>(m_currentPage)) {
-        gp->update(); // Gameplay logic with gravity
+        if (gp->wantsToReturn()) {
+            m_game->clear();
+            goBackToMenuProcedure();
+            pageSwitchSound.play(); 
+            m_menu.get()->playMenuBackGroundMusic();
+            // show gameover score and stuff
+        }
+        else {
+            gp->update(deltaTime); // Gameplay logic with gravity
+        }
     }
 }
 
@@ -94,8 +104,7 @@ void Game::loadResources()
         // TODO: change this horrible sound:
         ResourcesManager::get().loadSound("lock_piece", "resources/LockPiecec.wav");
         ResourcesManager::get().loadTexture("block_explosion", "resources/TetrisBlockExplosion.png");
-
-        //check
+        ResourcesManager::get().loadTexture("game_over_pic","resources/GameOverSign.png");
         ResourcesManager::get().loadTexture("fire_trail", "resources/MovingDownFast.png");
     }
     catch (const std::exception& e) {
@@ -144,4 +153,11 @@ void Game::startMusicFade(const std::string& musicKey, float durationSeconds)
     m_musicToFade = &ResourcesManager::get().getMusic(musicKey);
     m_fadeMusic = true;
     m_delay.start(durationSeconds);
+}
+
+void Game::goBackToMenuProcedure()
+{
+    m_menu->resetSelection();
+    m_currentPage = m_menu.get();
+    m_about.get()->resetAboutPage();
 }

@@ -57,6 +57,13 @@ void CubePattern::rotate(Board& board) {
     // If no kick works, no rotation
 }
 
+sf::Color CubePattern::getGhostColor() const
+{
+    sf::Color c = getColor();   // Getting the color of the current piece
+    c.a = 100;  // Reduce alpha for transparency (control the oppacity when a = 255 is normal color)
+    return c;
+}
+
 void CubePattern::draw(sf::RenderWindow& window, Board& board)
 {
     sf::RectangleShape block;
@@ -83,3 +90,21 @@ char CubePattern::getPatternGridSign() const
 {
     return m_gridSign;
 }
+
+void CubePattern::drawGhost(sf::RenderWindow& window, const Board& board, const sf::Vector2i& ghostPivot) const {
+    float blockSize = board.getBlockSize();
+    sf::Vector2f offset = board.getOffset();
+    sf::RectangleShape blockShape(sf::Vector2f(blockSize, blockSize));
+    blockShape.setOutlineThickness(1);
+    blockShape.setOutlineColor(sf::Color(255, 255, 255, 50)); // Light outline
+    blockShape.setFillColor(getGhostColor());
+
+    for (const auto& pos : getPatternPositions(ghostPivot)) {
+        sf::Vector2f worldPos;
+        worldPos.x = offset.x + pos.x * blockSize;
+        worldPos.y = offset.y + pos.y * blockSize;
+        blockShape.setPosition(worldPos);
+        window.draw(blockShape);
+    }
+}
+

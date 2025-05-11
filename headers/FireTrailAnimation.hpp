@@ -28,6 +28,9 @@ private:
     sf::Sprite m_sprite;
 
     sf::Vector2f m_worldPosition;
+
+    void updateSpriteFrame();  // Updates current frame & origin
+
 };
 
 #endif

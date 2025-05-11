@@ -8,7 +8,6 @@ public:
     AboutPage(sf::RenderWindow& window);
     void handleEvent(const sf::Event& event, const sf::RenderWindow& window) override;
     void draw(sf::RenderWindow& window) override;
-    bool wantsToReturn() const;
     void resetAboutPage();
 
 private:
@@ -17,7 +16,6 @@ private:
     sf::Sprite m_aboutBGSprite;
 
     bool m_hoverBack;
-    bool m_backToMenu;
 };
 #endif 
 

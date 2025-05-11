@@ -13,24 +13,36 @@ public:
     GamePlayPage(sf::RenderWindow& window);
     void handleEvent(const sf::Event& event, const sf::RenderWindow& window) override;
     void draw(sf::RenderWindow& window) override;
-    void update();  // Later: for gravity, score, game state
+    void update(const sf::Time deltaTime);  // Later: for gravity, score, game state
     CubePattern* getCurrentActivePiece() const;
+    void clear();
 
 private:
     Board m_board;
     std::unique_ptr<CubePattern> m_currentPiece;
     GravityTimer m_gravity;
     ShakeManager m_shake;
-
     std::vector<std::unique_ptr<BaseAnimation>> m_animations;
 
     std::unique_ptr<FireTrailAnimation> m_fireTrail;
-    bool m_downHeld = false;
-
+    bool m_downHeld;
+    bool m_gameOver;
+    //added
+    DelayTimer m_gameOverDelay;
     //LineClearAnimation m_lineClearAnimation;  
     std::set<int> m_pendingClearLines; 
 
     std::unique_ptr<CubePattern> spawnRandomPattern(); 
+    sf::Vector2i getComputedGhostPivotPiece();
+
+    //helpers
+    void updateAnimations(sf::Time dt);
+    bool handlePendingLineClears();
+    void handleGravity();
+    void updateFireTrail(sf::Time dt);
+    bool isGameOver();
+    void drawGameOverText(sf::RenderWindow& window);
+
 };
 
 #endif

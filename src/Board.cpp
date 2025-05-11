@@ -15,7 +15,7 @@ Board::Board(sf::Vector2u windowSize)
 	updateBlockSize(windowSize);
 }
 
-void Board::draw(sf::RenderWindow& window)
+void Board::draw(sf::RenderWindow& window, const int alpha) // alpha is for oppacity adjustment when default is 255
 {
 	for (int y = 0; y < HEIGHT; y++) {
 		for (int x = 0; x < WIDTH; x++) {
@@ -24,19 +24,20 @@ void Board::draw(sf::RenderWindow& window)
 				pos.x = m_boardOffset.x + x * m_blockSize;
 				pos.y = m_boardOffset.y + y * m_blockSize;
 				m_blockShape.setPosition(pos);
-
+				sf::Color c;
 				// Set colors based on Tetrimino type
 				switch (m_grid[y][x]) {
-				case 'I': m_blockShape.setFillColor(sf::Color::Cyan); break;
-				case 'O': m_blockShape.setFillColor(sf::Color::Yellow); break;
-				case 'T': m_blockShape.setFillColor(sf::Color::Magenta); break;
-				case 'S': m_blockShape.setFillColor(sf::Color::Green); break;
-				case 'Z': m_blockShape.setFillColor(sf::Color::Red); break;
-				case 'J': m_blockShape.setFillColor(sf::Color::Blue); break;
-				case 'L': m_blockShape.setFillColor(sf::Color::White); break;
-				default: m_blockShape.setFillColor(sf::Color::Black); break;
+				case 'I': c = sf::Color::Cyan; break;
+				case 'O': c = sf::Color::Yellow; break;
+				case 'T': c = sf::Color::Magenta; break;
+				case 'S': c = sf::Color::Green; break;
+				case 'Z': c = sf::Color::Red; break;
+				case 'J': c = sf::Color::Blue; break;
+				case 'L': c = sf::Color::White; break;
+				default: c = sf::Color::Black; break;
 				}
-
+				c.a = alpha;
+				m_blockShape.setFillColor(c);
 				window.draw(m_blockShape);
 			}
 		}
@@ -133,6 +134,41 @@ sf::Vector2f Board::getOffset() const
 {
 	return m_boardOffset;
 }
+
+void Board::clear()
+{
+	for (int i = 0; i < HEIGHT; ++i)
+		for (int j = 0; j < WIDTH; ++j)
+			m_grid[i][j] = '_';
+}
+
+//void Board::drawWithOpacity(sf::RenderWindow& window, const int alpha)
+//{
+//	for (int y = 0; y < HEIGHT; y++) {
+//		for (int x = 0; x < WIDTH; x++) {
+//			if (m_grid[y][x] != '_') {  // Draw only filled cells
+//				sf::Vector2f pos;
+//				pos.x = m_boardOffset.x + x * m_blockSize;
+//				pos.y = m_boardOffset.y + y * m_blockSize;
+//				m_blockShape.setPosition(pos);
+//
+//				// Set colors based on Tetrimino type
+//				switch (m_grid[y][x]) {
+//				case 'I': m_blockShape.setFillColor(sf::Color::Cyan); break;
+//				case 'O': m_blockShape.setFillColor(sf::Color::Yellow); break;
+//				case 'T': m_blockShape.setFillColor(sf::Color::Magenta); break;
+//				case 'S': m_blockShape.setFillColor(sf::Color::Green); break;
+//				case 'Z': m_blockShape.setFillColor(sf::Color::Red); break;
+//				case 'J': m_blockShape.setFillColor(sf::Color::Blue); break;
+//				case 'L': m_blockShape.setFillColor(sf::Color::White); break;
+//				default: m_blockShape.setFillColor(sf::Color::Black); break;
+//				}
+//
+//				window.draw(m_blockShape);
+//			}
+//		}
+//	}
+//}
 
 void Board::collapseLines(const std::set<int>& clearedRows)
 {

@@ -18,7 +18,7 @@ private:
 
 public:
     Board(sf::Vector2u windowSize); 
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window, const int alpha = 255);
     std::set<int> lockPiece(const CubePattern& piece);
     bool checkCollision(const std::vector<sf::Vector2i>& positions);
     char getCell(int x, int y) const;
@@ -29,6 +29,7 @@ public:
     void collapseLines(const std::set<int>& clearedRows);
     void clearLinesFromGrid(const std::set<int>& fullLines);
     sf::Vector2f getOffset() const;
+    void clear();
     //check
     void debugPrint() const;
 };

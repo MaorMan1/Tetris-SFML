@@ -20,9 +20,15 @@ public:
 	std::vector<sf::Vector2i> getPatternPositions(const sf::Vector2i nextPivot, const bool rotate = false) const;
 	void rotate(Board& board);
 	virtual sf::Color getColor() const = 0;
+	sf::Color getGhostColor() const;
 	void draw(sf::RenderWindow& window, Board& board);
 	sf::Vector2i getPivot() const;
 	char getPatternGridSign() const;
+
+
+	// Check
+	void drawGhost(sf::RenderWindow& window, const Board& board, const sf::Vector2i& ghostPivot) const;
+
 };
 
 

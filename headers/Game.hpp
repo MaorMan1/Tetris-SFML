@@ -10,10 +10,11 @@ public:
 	void run();
 	
 private:
-    void handlePageSwitching(sf::RenderWindow& window);
+    void handlePageSwitching(sf::RenderWindow& window, const sf::Time deltaTime);
     void loadResources();
     bool isDelayedHandle(sf::RenderWindow& window);
     void startMusicFade(const std::string& musicKey, float durationSeconds);
+    void goBackToMenuProcedure();
 
     std::unique_ptr<MenuMain> m_menu;
     std::unique_ptr<AboutPage> m_about;

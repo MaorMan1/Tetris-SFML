@@ -1,7 +1,7 @@
 #include "LineClearAnimation.hpp"
 
 LineClearAnimation::LineClearAnimation()
-    : m_frameDuration(sf::seconds(2.f)), // Default speed (adjusted dynamically later)
+    : m_frameDuration(sf::seconds(0.5f)), // Default speed (adjusted dynamically later)
     m_elapsed(sf::Time::Zero),
     m_currentFrame(0),
     m_explosionTexture(&ResourcesManager::get().getTexture("block_explosion")),
@@ -42,8 +42,8 @@ void LineClearAnimation::update(sf::Time dt)
     m_elapsed += dt;
 
     // Dynamically reduce the activation delay: create an accelerating effect
-    float baseDuration = 1.5f;
-    float accelerationFactor = 0.9f;
+    float baseDuration = 0.2f;
+    float accelerationFactor = 0.85f;
     m_frameDuration = sf::seconds(baseDuration * std::pow(accelerationFactor, m_activateColumn));
 
     if (m_elapsed >= m_frameDuration) {
