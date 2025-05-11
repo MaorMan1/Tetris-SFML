@@ -288,7 +288,7 @@ void GamePlayPage::drawGameOverText(sf::RenderWindow& window) {
     sf::Sprite sprite(ResourcesManager::get().getTexture("game_over_pic"));
     auto GOFrame = sf::IntRect(sf::Vector2i(77, 0), sf::Vector2i(226, 62));
     sprite.setTextureRect(GOFrame);
-    sprite.setScale(sf::Vector2f(1.5f, 1.5f)); // adjust
+    sprite.setScale(sf::Vector2f(1.5f, 1.5f));
     sf::FloatRect bounds = sprite.getGlobalBounds();
     sprite.setPosition(
         sf::Vector2f(
