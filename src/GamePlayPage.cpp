@@ -257,7 +257,7 @@ sf::Vector2i GamePlayPage::getComputedGhostPivotPiece()
             break; 
     }
     return ghostPivot;
-}//git chec
+}
 
 
 std::unique_ptr<CubePattern> GamePlayPage::spawnRandomPattern()
