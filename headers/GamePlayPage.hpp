@@ -27,10 +27,15 @@ private:
     std::unique_ptr<FireTrailAnimation> m_fireTrail;
     bool m_downHeld;
     bool m_gameOver;
+    bool m_countdownActive;
+
     //added
     DelayTimer m_gameOverDelay;
+    DelayTimer m_startDelay;
+    string m_lastNumCounted;
     //LineClearAnimation m_lineClearAnimation;  
     std::set<int> m_pendingClearLines; 
+    sf::Music* m_music = nullptr;
 
     std::unique_ptr<CubePattern> spawnRandomPattern(); 
     sf::Vector2i getComputedGhostPivotPiece();
@@ -42,7 +47,9 @@ private:
     void updateFireTrail(sf::Time dt);
     bool isGameOver();
     void drawGameOverText(sf::RenderWindow& window);
-
+    void drawCountdown(sf::RenderWindow& window);
+    void stopGPBackGroundMusic();
+    void playGPBackGroundMusic();
 };
 
 #endif

@@ -65,6 +65,7 @@ void Game::handlePageSwitching(sf::RenderWindow& window, const sf::Time deltaTim
             m_menu.get()->stopMenuBackGroundMusic();
             m_menu.get()->resetSelection();
             m_currentPage = m_game.get();
+            m_game.get()->clear();
             break;
         default:
             break;
@@ -101,11 +102,18 @@ void Game::loadResources()
         ResourcesManager::get().loadTexture("about_bg_pic", "resources/aboutPageBGPic.jpeg");
         ResourcesManager::get().loadSound("before_explosion", "resources/BeforeExplosion.wav");
         ResourcesManager::get().loadSound("explosion_sound", "resources/ClearLineExplosion.wav");
+        ResourcesManager::get().loadMusic("game_play_music", "resources/GamePlayMusic.ogg");
         // TODO: change this horrible sound:
         ResourcesManager::get().loadSound("lock_piece", "resources/LockPiecec.wav");
         ResourcesManager::get().loadTexture("block_explosion", "resources/TetrisBlockExplosion.png");
         ResourcesManager::get().loadTexture("game_over_pic","resources/GameOverSign.png");
         ResourcesManager::get().loadTexture("fire_trail", "resources/MovingDownFast.png");
+        // Robotic counter sounds:
+        ResourcesManager::get().loadSound("3", "resources/3Count.wav");
+        ResourcesManager::get().loadSound("2", "resources/2Count.wav");
+        ResourcesManager::get().loadSound("1", "resources/1Count.wav");
+        ResourcesManager::get().loadSound("Go!", "resources/GoCount.wav");
+
     }
     catch (const std::exception& e) {
         std::cerr << "Resource error: " << e.what() << std::endl;

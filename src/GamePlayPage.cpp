@@ -8,14 +8,17 @@
 #include "Pattern_Z.hpp"
 
 GamePlayPage::GamePlayPage(sf::RenderWindow& window) :
+    m_music(&ResourcesManager::get().getMusic("game_play_music")),
     m_board(window.getSize()),
     m_currentPiece(spawnRandomPattern()),
     m_fireTrail(std::make_unique<FireTrailAnimation>()),
     m_gameOver(false),
-    m_downHeld(false)
+    m_downHeld(false),
+    m_countdownActive(true)
 {
-    //m_backToMenu = false;
-    m_gravity.start(1.f);   // Initial delay of 1 second
+    m_music->setLooping(true);
+    //m_music->setVolume(100.f); // Adjust as needed
+    clear();
 }
 
 void GamePlayPage::handleEvent(const sf::Event& event, const sf::RenderWindow& window)
@@ -51,11 +54,19 @@ void GamePlayPage::handleEvent(const sf::Event& event, const sf::RenderWindow& w
 
 void GamePlayPage::draw(sf::RenderWindow& window)
 {
+    if (m_countdownActive) { // 3 second count in the beginning
+        m_board.draw(window, 100); // oppacity alpha is 100 out of 255
+        drawCountdown(window);
+        return; // Don't draw piece or anything else
+    }
+
+    // Game over draw handle
     if (m_gameOver) {
         m_board.draw(window, 100); // oppacity alpha is 100 out of 255
         drawGameOverText(window);             // draws centered PNG
         return;
     }
+
     // Push shake offset
     sf::View view = window.getView();
     sf::Vector2f shakeOffset = m_shake.getShakeOffset();
@@ -94,8 +105,13 @@ void GamePlayPage::clear()
     // Clear grid to reuse
     m_board.clear();
     // Reset gameplay state
-    m_currentPiece = spawnRandomPattern();
-    m_gravity.start(1.f);
+    // 
+    //m_currentPiece = spawnRandomPattern();
+    m_currentPiece.reset(); // Don't spawn yet!
+    m_countdownActive = true;
+    m_startDelay.start(4.f); // Start 3-second countdown and go! sign(4 sec)
+    m_lastNumCounted = "";
+    //m_gravity.start(1.f);
 
     m_animations.clear();
     m_pendingClearLines.clear();
@@ -109,6 +125,15 @@ void GamePlayPage::clear()
 
 void GamePlayPage::update(const sf::Time deltaTime)
 {
+    if (m_countdownActive) {
+        if (m_startDelay.isDone()) {
+            m_countdownActive = false;
+            m_currentPiece = spawnRandomPattern(); // spawn after countdown
+            playGPBackGroundMusic();
+            m_gravity.start(1.f);
+        }
+        return; // Don't update game until countdown done
+    }
     if (m_gameOver) {
         if (m_gameOverDelay.isDone()) {
             m_backToMenu = true;
@@ -172,9 +197,8 @@ void GamePlayPage::handleGravity()
         m_currentPiece->moveDown(m_board);
     }
     else {
-        if (m_fireTrail) m_fireTrail->stop();
-
         ResourcesManager::get().getSound("lock_piece").play();
+        if (m_fireTrail) m_fireTrail->stop();
         auto affectedRows = m_board.lockPiece(*m_currentPiece);
         auto fullLines = m_board.findFullLines(affectedRows);
 
@@ -192,6 +216,7 @@ void GamePlayPage::handleGravity()
         else {
             m_currentPiece = spawnRandomPattern();
             if (isGameOver()){
+                stopGPBackGroundMusic();
                 //m_backToMenu = true;
                 m_currentPiece.reset();
             }
@@ -296,5 +321,51 @@ void GamePlayPage::drawGameOverText(sf::RenderWindow& window) {
         window.getSize().y / 3.f - bounds.size.y / 2.f
         )
     );
+    // TODO: add score
     window.draw(sprite);
+}
+
+void GamePlayPage::drawCountdown(sf::RenderWindow& window)
+{
+    float secondsLeft = m_startDelay.getDuration().asSeconds() - m_startDelay.getElapsed().asSeconds();
+
+    std::string displayText;
+    if (secondsLeft > 3.0f)
+        displayText = "3";
+    else if (secondsLeft > 2.0f)
+        displayText = "2";
+    else if (secondsLeft > 1.0f)
+        displayText = "1";
+    else
+        displayText = "Go!";
+    if (displayText != m_lastNumCounted) {
+        m_lastNumCounted = displayText;
+        ResourcesManager::get().getSound(m_lastNumCounted).play();
+    }
+    sf::Text text(ResourcesManager::get().getFont("main"));
+    //text.setFont(ResourcesManager::get().getFont("main"));
+    // TODO add the sound
+    text.setString(m_lastNumCounted);
+    text.setCharacterSize(100);
+    text.setFillColor(sf::Color::White);
+
+    // Center the text
+    sf::FloatRect bounds = text.getLocalBounds();
+    text.setOrigin(sf::Vector2f(bounds.size.x / 2.f, bounds.size.y / 2.f));
+    text.setPosition(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
+
+    window.draw(text);
+}
+
+void GamePlayPage::stopGPBackGroundMusic()
+{
+    if (m_music->getStatus() == sf::SoundSource::Status::Playing)
+        m_music->stop();
+}
+
+void GamePlayPage::playGPBackGroundMusic()
+{
+    if (m_music->getStatus() == sf::SoundSource::Status::Stopped ||
+        m_music->getStatus() == sf::SoundSource::Status::Paused)
+        m_music->play();
 }
