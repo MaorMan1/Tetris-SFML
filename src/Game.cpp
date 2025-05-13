@@ -108,6 +108,7 @@ void Game::loadResources()
         ResourcesManager::get().loadTexture("block_explosion", "resources/TetrisBlockExplosion.png");
         ResourcesManager::get().loadTexture("game_over_pic","resources/GameOverSign.png");
         ResourcesManager::get().loadTexture("fire_trail", "resources/MovingDownFast.png");
+        ResourcesManager::get().loadTexture("ui_bar_bg", "resources/BarBG.png");
         // Robotic counter sounds:
         ResourcesManager::get().loadSound("3", "resources/3Count.wav");
         ResourcesManager::get().loadSound("2", "resources/2Count.wav");

@@ -14,7 +14,8 @@ GamePlayPage::GamePlayPage(sf::RenderWindow& window) :
     m_fireTrail(std::make_unique<FireTrailAnimation>()),
     m_gameOver(false),
     m_downHeld(false),
-    m_countdownActive(true)
+    m_countdownActive(true),
+    m_uiBar(window.getSize(), m_board.getBlockSize(), m_board.getOffset())
 {
     m_music->setLooping(true);
     //m_music->setVolume(100.f); // Adjust as needed
@@ -56,6 +57,7 @@ void GamePlayPage::draw(sf::RenderWindow& window)
 {
     if (m_countdownActive) { // 3 second count in the beginning
         m_board.draw(window, 100); // oppacity alpha is 100 out of 255
+        m_uiBar.draw(window, 100);
         drawCountdown(window);
         return; // Don't draw piece or anything else
     }
@@ -63,6 +65,7 @@ void GamePlayPage::draw(sf::RenderWindow& window)
     // Game over draw handle
     if (m_gameOver) {
         m_board.draw(window, 100); // oppacity alpha is 100 out of 255
+        m_uiBar.draw(window, 100);
         drawGameOverText(window);             // draws centered PNG
         return;
     }
@@ -75,6 +78,7 @@ void GamePlayPage::draw(sf::RenderWindow& window)
 
     // Draw board normally
     m_board.draw(window);
+    m_uiBar.draw(window);
     if (m_fireTrail)
         m_fireTrail->draw(window, m_board.getBlockSize(), m_board.getOffset());
     if (m_currentPiece)

@@ -7,6 +7,7 @@
 #include "ShakeManager.hpp"
 #include "BaseAnimation.hpp"
 #include "FireTrailAnimation.hpp"
+#include "UIBar.hpp"
 
 class GamePlayPage : public Page {
 public:
@@ -39,6 +40,10 @@ private:
 
     std::unique_ptr<CubePattern> spawnRandomPattern(); 
     sf::Vector2i getComputedGhostPivotPiece();
+
+    //ccc
+    UIBar m_uiBar;
+
 
     //helpers
     void updateAnimations(sf::Time dt);

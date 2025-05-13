@@ -114,22 +114,6 @@ std::set<int> Board::findFullLines(const std::set<int>& rowsToCheck) const
 	return fullLines;
 }
 
-//void Board::clearLines(const std::set<int>& fullLines)
-//{
-//	for (int row : fullLines) {
-//		for (int y = row; y > 0; --y) {
-//			for (int x = 0; x < WIDTH; ++x) {
-//				m_grid[y][x] = m_grid[y - 1][x];
-//			}
-//		}
-//
-//		// Clear top row
-//		for (int x = 0; x < WIDTH; ++x) {
-//			m_grid[0][x] = '_';
-//		}
-//	}
-//}
-
 sf::Vector2f Board::getOffset() const
 {
 	return m_boardOffset;
