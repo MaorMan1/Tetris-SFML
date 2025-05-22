@@ -51,4 +51,11 @@ enum class PatternPosition {
     _180deg,
     _270deg
 };
+
+
+enum class DisplaysOptions
+{
+    Score,
+    NextPattern
+};
 #endif 

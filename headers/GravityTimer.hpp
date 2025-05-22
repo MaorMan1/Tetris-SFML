@@ -1,6 +1,7 @@
 #ifndef TETRIS_GRAVITYTIMER_HPP
 #define TETRIS_GRAVITYTIMER_HPP
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 class GravityTimer {
 public:

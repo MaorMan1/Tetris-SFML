@@ -1,8 +1,10 @@
 #ifndef TETRIS_CUBEPATTERN_HPP
 #define TETRIS_CUBEPATTERN_HPP
 #include <SFML/Graphics.hpp>
+#include "UIBar.hpp"
 
 class Board;
+class DisplayWindow;
 
 class CubePattern {
 protected:
@@ -24,11 +26,8 @@ public:
 	void draw(sf::RenderWindow& window, Board& board);
 	sf::Vector2i getPivot() const;
 	char getPatternGridSign() const;
-
-
-	// Check
 	void drawGhost(sf::RenderWindow& window, const Board& board, const sf::Vector2i& ghostPivot) const;
-
+	void drawDisplayPattern(sf::RenderWindow& window, const float blockSize, const DisplayWindow& display, const int alpha) const;
 };
 
 

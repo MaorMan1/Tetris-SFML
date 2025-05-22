@@ -10,7 +10,7 @@
 GamePlayPage::GamePlayPage(sf::RenderWindow& window) :
     m_music(&ResourcesManager::get().getMusic("game_play_music")),
     m_board(window.getSize()),
-    m_currentPiece(spawnRandomPattern()),
+    m_nextPiece(reloadRandomPattern()),
     m_fireTrail(std::make_unique<FireTrailAnimation>()),
     m_gameOver(false),
     m_downHeld(false),
@@ -19,6 +19,9 @@ GamePlayPage::GamePlayPage(sf::RenderWindow& window) :
 {
     m_music->setLooping(true);
     //m_music->setVolume(100.f); // Adjust as needed
+    
+    // Done here and not in the initialize to make sure that current piece spawned after next piece reload to avoid unknown behavior:
+    m_currentPiece = spawnNextPattern();
     clear();
 }
 
@@ -79,6 +82,11 @@ void GamePlayPage::draw(sf::RenderWindow& window)
     // Draw board normally
     m_board.draw(window);
     m_uiBar.draw(window);
+
+    // For safe usage
+    if (!m_nextPiece) 
+        m_nextPiece = reloadRandomPattern();
+     
     if (m_fireTrail)
         m_fireTrail->draw(window, m_board.getBlockSize(), m_board.getOffset());
     if (m_currentPiece)
@@ -86,13 +94,10 @@ void GamePlayPage::draw(sf::RenderWindow& window)
     if (m_currentPiece)
         m_currentPiece->drawGhost(window, m_board, getComputedGhostPivotPiece());
 
-
     // Draw explosion animation
-    //m_lineClearAnimation.draw(window, m_board.getBlockSize(), m_board.getOffset()); //*
     for (const auto& anim : m_animations) {
         anim->draw(window, m_board.getBlockSize(), m_board.getOffset());
     }
-
 
     // Restore view
     view.move(-shakeOffset);
@@ -106,16 +111,14 @@ CubePattern* GamePlayPage::getCurrentActivePiece() const
 
 void GamePlayPage::clear()
 {
-    // Clear grid to reuse
     m_board.clear();
-    // Reset gameplay state
-    // 
-    //m_currentPiece = spawnRandomPattern();
-    m_currentPiece.reset(); // Don't spawn yet!
+    m_currentPiece = nullptr;
+    m_nextPiece = reloadRandomPattern(); 
+    m_uiBar.updateNextPiece(m_nextPiece.get());
+
     m_countdownActive = true;
-    m_startDelay.start(4.f); // Start 3-second countdown and go! sign(4 sec)
+    m_startDelay.start(4.f);
     m_lastNumCounted = "";
-    //m_gravity.start(1.f);
 
     m_animations.clear();
     m_pendingClearLines.clear();
@@ -125,6 +128,8 @@ void GamePlayPage::clear()
     m_gameOverDelay.reset();
 
     m_backToMenu = false;
+    m_score = 0;
+    m_uiBar.updateScore(m_score);
 }
 
 void GamePlayPage::update(const sf::Time deltaTime)
@@ -132,7 +137,8 @@ void GamePlayPage::update(const sf::Time deltaTime)
     if (m_countdownActive) {
         if (m_startDelay.isDone()) {
             m_countdownActive = false;
-            m_currentPiece = spawnRandomPattern(); // spawn after countdown
+            //m_nextPiece = reloadRandomPattern();
+            m_currentPiece = spawnNextPattern(); // spawn after countdown
             playGPBackGroundMusic();
             m_gravity.start(1.f);
         }
@@ -184,7 +190,7 @@ bool GamePlayPage::handlePendingLineClears()
     m_board.debugPrint();
     m_pendingClearLines.clear();
 
-    m_currentPiece = spawnRandomPattern();
+    m_currentPiece = spawnNextPattern();
     m_gravity.speedUp();
     return true;
 }
@@ -207,6 +213,8 @@ void GamePlayPage::handleGravity()
         auto fullLines = m_board.findFullLines(affectedRows);
 
         if (!fullLines.empty()) {
+            addScore(static_cast<int>(fullLines.size()));
+            m_uiBar.updateScore(m_score);
             m_board.clearLinesFromGrid(fullLines);
             m_shake.start(fullLines.size() /** 2.f*/, fullLines.size() /** 5.f*/); //?
 
@@ -218,13 +226,13 @@ void GamePlayPage::handleGravity()
             m_currentPiece.reset(); // Wait for clear to spawn new one
         }
         else {
-            m_currentPiece = spawnRandomPattern();
+            m_currentPiece = spawnNextPattern();
             if (isGameOver()){
+                // TODO - reset score after check for leaderboard
                 stopGPBackGroundMusic();
-                //m_backToMenu = true;
                 m_currentPiece.reset();
             }
-            m_gravity.speedUp();
+            //m_gravity.speedUp();
         }
     }
 
@@ -289,7 +297,15 @@ sf::Vector2i GamePlayPage::getComputedGhostPivotPiece()
 }
 
 
-std::unique_ptr<CubePattern> GamePlayPage::spawnRandomPattern()
+std::unique_ptr<CubePattern> GamePlayPage::spawnNextPattern()
+{
+    std::unique_ptr<CubePattern> toSpawn = std::move(m_nextPiece);
+    m_nextPiece = reloadRandomPattern();
+    m_uiBar.updateNextPiece(m_nextPiece.get());
+    return toSpawn;
+}
+
+std::unique_ptr<CubePattern> GamePlayPage::reloadRandomPattern()
 {
     Patterns randomPattern = static_cast<Patterns>(rand() % static_cast<int>(Patterns::Count));
 
@@ -372,4 +388,16 @@ void GamePlayPage::playGPBackGroundMusic()
     if (m_music->getStatus() == sf::SoundSource::Status::Stopped ||
         m_music->getStatus() == sf::SoundSource::Status::Paused)
         m_music->play();
+}
+
+void GamePlayPage::addScore(int linesCleared)
+{
+    switch (linesCleared) {
+    case 1: m_score += 100; break;
+    case 2: m_score += 300; break;
+    case 3: m_score += 500; break;
+    case 4: m_score += 800; break;
+    default: break;
+    }
+    cout << m_score << endl;
 }
