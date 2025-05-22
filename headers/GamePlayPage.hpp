@@ -20,6 +20,7 @@ public:
 
 private:
     Board m_board;
+    std::unique_ptr<CubePattern> m_nextPiece;
     std::unique_ptr<CubePattern> m_currentPiece;
     GravityTimer m_gravity;
     ShakeManager m_shake;
@@ -30,6 +31,8 @@ private:
     bool m_gameOver;
     bool m_countdownActive;
 
+    int m_score = 0;
+
     //added
     DelayTimer m_gameOverDelay;
     DelayTimer m_startDelay;
@@ -38,7 +41,8 @@ private:
     std::set<int> m_pendingClearLines; 
     sf::Music* m_music = nullptr;
 
-    std::unique_ptr<CubePattern> spawnRandomPattern(); 
+    std::unique_ptr<CubePattern> spawnNextPattern(); 
+    std::unique_ptr<CubePattern> reloadRandomPattern();
     sf::Vector2i getComputedGhostPivotPiece();
 
     //ccc
@@ -55,6 +59,9 @@ private:
     void drawCountdown(sf::RenderWindow& window);
     void stopGPBackGroundMusic();
     void playGPBackGroundMusic();
+    void addScore(int linesCleared);
+    int getScore() const { return m_score; }
+
 };
 
 #endif

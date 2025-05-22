@@ -18,6 +18,7 @@ void GravityTimer::speedUp(float factor){ // Factor is 0.95 by default
     m_delay *= factor;
     if (m_delay < 0.1f)
         m_delay = 0.1f; // clamp to prevent going too fast
+    std::cout << "Speed up delay: " << m_delay << std::endl;
 }
 
 float GravityTimer::getDelay() const

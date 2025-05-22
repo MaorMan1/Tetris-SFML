@@ -81,6 +81,25 @@ void CubePattern::draw(sf::RenderWindow& window, Board& board)
     }
 }
 
+void CubePattern::drawDisplayPattern(sf::RenderWindow& window, const float blockSize, const DisplayWindow& display, const int alpha) const
+{
+    sf::RectangleShape block;
+    block.setSize(sf::Vector2f(blockSize, blockSize));
+    block.setOutlineThickness(1);
+    block.setOutlineColor(sf::Color::Black);
+    auto c = getColor();
+    c.a = alpha;
+    block.setFillColor(c);
+
+    for (const auto& offset : m_rotations[m_rotationIndex]) {
+        sf::Vector2i absPos = display.getDispPivot() + offset;
+        sf::Vector2f pixelPos = display.getPosition() + sf::Vector2f(absPos.x, absPos.y) * blockSize;
+
+        block.setPosition(pixelPos);
+        window.draw(block);
+    }
+}
+
 sf::Vector2i CubePattern::getPivot() const
 {
     return m_pivot;

@@ -14,6 +14,7 @@ void Game::run()
     m_menu = std::make_unique<MenuMain>(window);
     m_about = std::make_unique<AboutPage>(window);
     m_game = std::make_unique<GamePlayPage>(window);
+    // TODO - m_leaderboard ...
     Board board(window.getSize());
 
     m_currentPage = m_menu.get();
