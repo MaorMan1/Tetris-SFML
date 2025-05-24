@@ -40,13 +40,12 @@ private:
     //LineClearAnimation m_lineClearAnimation;  
     std::set<int> m_pendingClearLines; 
     sf::Music* m_music = nullptr;
+    UIBar m_uiBar;
 
     std::unique_ptr<CubePattern> spawnNextPattern(); 
     std::unique_ptr<CubePattern> reloadRandomPattern();
     sf::Vector2i getComputedGhostPivotPiece();
 
-    //ccc
-    UIBar m_uiBar;
 
 
     //helpers

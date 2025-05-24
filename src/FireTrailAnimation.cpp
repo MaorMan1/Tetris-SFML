@@ -62,7 +62,9 @@ void FireTrailAnimation::draw(sf::RenderWindow& window, float blockSize, sf::Vec
 
     float scaleFactor = blockSize / 16.f;  // Adjust scale to fit game block size
     m_sprite.setScale(sf::Vector2f(scaleFactor, scaleFactor));
-
+    auto c = m_sprite.getColor();
+    c.a = 230; // For a little bit oppacity for the flames (230 out of 255).
+    m_sprite.setColor(c);
     window.draw(m_sprite);
 }
 

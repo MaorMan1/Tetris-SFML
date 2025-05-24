@@ -56,12 +56,10 @@ void DisplayWindow::draw(sf::RenderWindow& window, const int alpha, const CubePa
         window.draw(withAlpha(m_valueText, alpha));
         break;
     case DisplaysOptions::NextPattern:
-        piece->drawDisplayPattern(window, blockSize, *this, alpha);
+        if(piece) 
+            piece->drawDisplayPattern(window, blockSize, *this, alpha);
         break;
     }
-
-    /*else if(m_title == "Next:")
-        */
 }
 
 sf::Vector2f DisplayWindow::getPosition() const
@@ -78,3 +76,7 @@ sf::Vector2i DisplayWindow::getDispPivot() const {
     return m_dispPivot;
 }
 
+// If needed later
+sf::Vector2f DisplayWindow::getCenter() const {
+    return m_position + m_size / 2.f;
+}

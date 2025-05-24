@@ -20,6 +20,7 @@ public:
     sf::Vector2f getPosition() const;
     sf::Vector2f getSize() const;
     sf::Vector2i getDispPivot() const;
+    sf::Vector2f getCenter() const;
 
 private:
     sf::Vector2f m_position;

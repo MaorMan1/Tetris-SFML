@@ -43,38 +43,6 @@ void UIBar::draw(sf::RenderWindow& window, const int alpha)
 	for (const auto& dw : m_displays) {
 		dw.draw(window, alpha, m_nextPiece, m_blockSize);
 	}
-
-
-	// new check!!
-	// Draw next piece into the 2nd DisplayWindow
-	//	const auto& pattern = m_nextPiece->getPatternPositions();
-	//	char sign = m_nextPiece->getPatternGridSign();
-
-	//	sf::Sprite blockSprite(ResourcesManager::get().getTexture("block_sheet"));
-	//	blockSprite.setTextureRect(ResourcesManager::get().getBlockTextureRect(sign));
-	//	float tileSize = m_blockSize * 0.75f; // slightly smaller
-	//	blockSprite.setScale(tileSize / 32.f, tileSize / 32.f);
-
-	//	const sf::Vector2f& boxPos = m_displays[1].getPosition();
-	//	const sf::Vector2f& boxSize = m_displays[1].getSize();
-
-	//	// Center sprite drawing inside the window
-	//	sf::Vector2f center = boxPos + boxSize / 2.f;
-
-	//	int rows = static_cast<int>(pattern.size());
-	//	int cols = static_cast<int>(pattern[0].size());
-
-	//	for (int r = 0; r < rows; ++r) {
-	//		for (int c = 0; c < cols; ++c) {
-	//			if (pattern[r][c] != ' ')
-	//			{
-	//				sf::Vector2f offset((c - cols / 2.f) * tileSize, (r - rows / 2.f) * tileSize);
-	//				blockSprite.setPosition(center + offset);
-	//				window.draw(blockSprite);
-	//			}
-	//		}
-	//	}
-	//}
 }
 
 void UIBar::drawBackground(sf::RenderWindow& window, int alpha)
