@@ -58,4 +58,15 @@ enum class DisplaysOptions
     Score,
     NextPattern
 };
+enum class Button {
+    Pause,
+    Play,
+    Retry,
+    Home
+};
+enum class ButtonStatus {
+    Normal,
+    Clicked,
+    Hovered
+};
 #endif 

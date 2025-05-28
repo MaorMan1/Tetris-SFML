@@ -126,4 +126,3 @@ void CubePattern::drawGhost(sf::RenderWindow& window, const Board& board, const 
         window.draw(blockShape);
     }
 }
-

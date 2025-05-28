@@ -9,6 +9,9 @@
 #include "ResourcesManager.hpp"
 #include "DisplayWindow.hpp"
 #include "CubePattern.hpp"
+#include "ButtonRetry.hpp"
+#include "ButtonPause.hpp"
+#include "ButtonBackToMenu.hpp"
 
 // Forward declarations
 class CubePattern;
@@ -17,6 +20,7 @@ class DisplayWindow;
 class UIBar {
 public:
 	UIBar(sf::Vector2u windowSize, const float blockSize, const sf::Vector2f boardOffset);
+	
 	float getBlockSize() const;
 	sf::Vector2f getUIBarOffset();
 	//check
@@ -27,6 +31,7 @@ public:
 private:
 	//check
 	std::vector<DisplayWindow> m_displays;
+	std::vector<std::unique_ptr<UIButton>> m_buttons;
 
 	sf::Sprite m_blockSprite; 
 	float m_blockSize;
@@ -35,6 +40,7 @@ private:
 	CubePattern* m_nextPiece = nullptr; // check(Pointer only (not owning))
 
 	void drawBackground(sf::RenderWindow& window, int alpha);
+	void positionButtons(sf::Vector2u windowSize, const float space);
 };
 
 #endif

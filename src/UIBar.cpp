@@ -25,6 +25,33 @@ UIBar::UIBar(sf::Vector2u windowSize, const float blockSize, const sf::Vector2f 
 	m_displays.emplace_back(sf::Vector2f(centerX, m_UIBarOffset.y + 2 * space + displaySize),
 		sf::Vector2f(2*displaySize, displaySize),
 		"Next:", DisplaysOptions::NextPattern);
+
+	m_buttons.emplace_back(std::make_unique<ButtonPause>());
+	m_buttons.emplace_back(std::make_unique<ButtonBackToMenu>());
+	m_buttons.emplace_back(std::make_unique<ButtonRetry>());
+
+	positionButtons(windowSize, space);
+}
+
+void UIBar::positionButtons(sf::Vector2u windowSize, const float space)
+{
+	if (m_buttons.empty()) return;
+
+	sf::Vector2f buttonSize(2 * m_blockSize, 2 * m_blockSize);
+	size_t numButtons = m_buttons.size();
+
+	float availableWidth = windowSize.x - m_UIBarOffset.x;
+	float totalButtonsWidth = numButtons * buttonSize.x;
+	float totalSpacing = availableWidth - totalButtonsWidth;
+	float buttonSpacing = totalSpacing / (numButtons + 1);
+
+	float yPos = windowSize.y - buttonSize.y;
+	float xPos = m_UIBarOffset.x + buttonSpacing;
+
+	for (auto& btn : m_buttons) {
+		btn->setPositionAndScale(sf::Vector2f(xPos, yPos - space), buttonSize);
+		xPos += buttonSize.x + buttonSpacing;
+	}
 }
 
 float UIBar::getBlockSize() const
@@ -42,6 +69,9 @@ void UIBar::draw(sf::RenderWindow& window, const int alpha)
 	drawBackground(window, alpha);
 	for (const auto& dw : m_displays) {
 		dw.draw(window, alpha, m_nextPiece, m_blockSize);
+	}
+	for (const auto& btn : m_buttons) {
+		btn->draw(window, alpha);
 	}
 }
 

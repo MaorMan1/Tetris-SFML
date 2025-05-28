@@ -110,12 +110,12 @@ void Game::loadResources()
         ResourcesManager::get().loadTexture("game_over_pic","resources/GameOverSign.png");
         ResourcesManager::get().loadTexture("fire_trail", "resources/MovingDownFastNew.png");
         ResourcesManager::get().loadTexture("ui_bar_bg", "resources/BarBG.png");
+        ResourcesManager::get().loadTexture("buttons", "resources/Buttons.png");
         // Robotic counter sounds:
         ResourcesManager::get().loadSound("3", "resources/3Count.wav");
         ResourcesManager::get().loadSound("2", "resources/2Count.wav");
         ResourcesManager::get().loadSound("1", "resources/1Count.wav");
         ResourcesManager::get().loadSound("Go!", "resources/GoCount.wav");
-
     }
     catch (const std::exception& e) {
         std::cerr << "Resource error: " << e.what() << std::endl;
