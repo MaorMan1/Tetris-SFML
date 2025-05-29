@@ -23,13 +23,15 @@ public:
 	
 	float getBlockSize() const;
 	sf::Vector2f getUIBarOffset();
-	//check
 	void updateScore(int score);
 	void updateNextPiece(CubePattern* nextPiece);
 	void draw(sf::RenderWindow& window, const int alpha = 255);
+	void mouseButtonClick(const sf::Vector2f& mousePos);
+	Button mouseButtonHandle();
+	void update();
+	void resetButtons();
 
 private:
-	//check
 	std::vector<DisplayWindow> m_displays;
 	std::vector<std::unique_ptr<UIButton>> m_buttons;
 

@@ -23,7 +23,7 @@ public:
 	void rotate(Board& board);
 	virtual sf::Color getColor() const = 0;
 	sf::Color getGhostColor() const;
-	void draw(sf::RenderWindow& window, Board& board);
+	void draw(sf::RenderWindow& window, Board& board, const int alpha = 255);
 	sf::Vector2i getPivot() const;
 	char getPatternGridSign() const;
 	void drawGhost(sf::RenderWindow& window, const Board& board, const sf::Vector2i& ghostPivot) const;

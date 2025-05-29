@@ -64,13 +64,15 @@ sf::Color CubePattern::getGhostColor() const
     return c;
 }
 
-void CubePattern::draw(sf::RenderWindow& window, Board& board)
+void CubePattern::draw(sf::RenderWindow& window, Board& board, const int alpha)
 {
     sf::RectangleShape block;
     block.setSize(sf::Vector2f(board.getBlockSize(), board.getBlockSize()));
     block.setOutlineThickness(1);
     block.setOutlineColor(sf::Color::Black);
-    block.setFillColor(getColor());
+    auto c = getColor();
+    c.a = alpha;
+    block.setFillColor(c);
 
     for (const auto& offset : m_rotations[m_rotationIndex]) {
         sf::Vector2i absPos = m_pivot + offset;

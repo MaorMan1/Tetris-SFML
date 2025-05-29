@@ -9,7 +9,8 @@
 class ButtonBackToMenu : public UIButton {
 public:
     ButtonBackToMenu();
-    void onClick() override;
+    Button onClick() override;
+    void reset() override;
 };
 
 #endif

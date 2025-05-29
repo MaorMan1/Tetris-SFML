@@ -9,7 +9,8 @@
 class ButtonRetry: public UIButton {
 public:
     ButtonRetry();
-    void onClick() override;
+    Button onClick() override;
+    void reset() override;
 };
 
 #endif

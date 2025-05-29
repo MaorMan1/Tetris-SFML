@@ -1,4 +1,4 @@
-#include "GamePlayPage.hpp"
+﻿#include "GamePlayPage.hpp"
 #include "Pattern_I.hpp"
 #include "Pattern_O.hpp"
 #include "Pattern_T.hpp"
@@ -14,10 +14,19 @@ GamePlayPage::GamePlayPage(sf::RenderWindow& window) :
     m_fireTrail(std::make_unique<FireTrailAnimation>()),
     m_gameOver(false),
     m_downHeld(false),
+    m_pause(false),
+    m_pauseText(ResourcesManager::get().getFont("main")),
     m_countdownActive(true),
-    m_uiBar(window.getSize(), m_board.getBlockSize(), m_board.getOffset())
+    m_uiBar(window.getSize(), m_board.getBlockSize(), m_board.getOffset())/*,
+    m_mouseLeftHeld(false)*/
 {
+    // Set hover mouse effect
+    m_hoverCircle.setRadius(20.f); // Radius of the hover effect
+    m_hoverCircle.setFillColor(sf::Color(255, 255, 0, 100)); // Yellowish with transparency
+    m_hoverCircle.setOrigin(sf::Vector2f(m_hoverCircle.getRadius(), m_hoverCircle.getRadius())); // Centered
+
     m_music->setLooping(true);
+    setPauseText();
     //m_music->setVolume(100.f); // Adjust as needed
     
     // Done here and not in the initialize to make sure that current piece spawned after next piece reload to avoid unknown behavior:
@@ -27,6 +36,7 @@ GamePlayPage::GamePlayPage(sf::RenderWindow& window) :
 
 void GamePlayPage::handleEvent(const sf::Event& event, const sf::RenderWindow& window)
 {
+    // Keyboard events
     if (!m_currentPiece) return;
     if (event.is<sf::Event::KeyPressed>()) {
         const auto& key = event.getIf<sf::Event::KeyPressed>()->code;
@@ -53,6 +63,22 @@ void GamePlayPage::handleEvent(const sf::Event& event, const sf::RenderWindow& w
             if (m_fireTrail) m_fireTrail->stop();
         }
     }
+    // Mouse events
+    if (event.is<sf::Event::MouseButtonPressed>()) {
+        ResourcesManager::get().getSound("mouse_click").play();
+        const auto& mouseEvent = event.getIf<sf::Event::MouseButtonPressed>();
+        if (mouseEvent->button == sf::Mouse::Button::Left) {
+            sf::Vector2f mousePos(static_cast<float>(mouseEvent->position.x), static_cast<float>(mouseEvent->position.y));
+            m_uiBar.mouseButtonClick(mousePos);
+        }
+    }
+    if (event.is<sf::Event::MouseButtonReleased>()) {
+        const auto& mouseEvent = event.getIf<sf::Event::MouseButtonReleased>();
+        if (mouseEvent->button == sf::Mouse::Button::Left) {
+            handleButtonClick(m_uiBar.mouseButtonHandle());
+        }
+    }
+
     // TODO - add later for mouse event if reset level or back to menu or pause
 }
 
@@ -70,6 +96,23 @@ void GamePlayPage::draw(sf::RenderWindow& window)
         m_board.draw(window, 100); // oppacity alpha is 100 out of 255
         m_uiBar.draw(window, 100);
         drawGameOverText(window);             // draws centered PNG
+        return;
+    }
+
+    if (m_pause) {
+        m_board.draw(window, 100); // oppacity alpha is 100 out of 255
+        m_uiBar.draw(window);
+        if (m_currentPiece)
+            m_currentPiece->draw(window, m_board, 100);
+        drawPauseText(window);
+
+        // Draw hover circle if on text
+        sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
+        sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);
+        m_hoverCircle.setPosition(worldPos);
+        if (m_pauseText.getGlobalBounds().contains(worldPos)) {
+            window.draw(m_hoverCircle);
+        }
         return;
     }
 
@@ -125,14 +168,16 @@ void GamePlayPage::clear()
 
     m_downHeld = false;
     m_gameOver = false;
+    m_pause = false;
     m_gameOverDelay.reset();
 
     m_backToMenu = false;
     m_score = 0;
     m_uiBar.updateScore(m_score);
+    m_uiBar.resetButtons();
 }
 
-void GamePlayPage::update(const sf::Time deltaTime)
+void GamePlayPage::update(const sf::Time deltaTime, const sf::RenderWindow& window)
 {
     if (m_countdownActive) {
         if (m_startDelay.isDone()) {
@@ -150,6 +195,13 @@ void GamePlayPage::update(const sf::Time deltaTime)
         }
         return;
     }
+    if (m_pause) {
+        m_uiBar.update();
+        return;
+    }
+
+    m_uiBar.update();
+
     //const sf::Time deltaTime = sf::seconds(1.f / 60.f); // Target frame time (~60 FPS)
 
     m_shake.update(deltaTime);
@@ -167,6 +219,7 @@ void GamePlayPage::update(const sf::Time deltaTime)
     handleGravity();
 
     updateFireTrail(deltaTime);
+
 }
 
 void GamePlayPage::updateAnimations(sf::Time dt)
@@ -363,8 +416,6 @@ void GamePlayPage::drawCountdown(sf::RenderWindow& window)
         ResourcesManager::get().getSound(m_lastNumCounted).play();
     }
     sf::Text text(ResourcesManager::get().getFont("main"));
-    //text.setFont(ResourcesManager::get().getFont("main"));
-    // TODO add the sound
     text.setString(m_lastNumCounted);
     text.setCharacterSize(100);
     text.setFillColor(sf::Color::White);
@@ -379,8 +430,15 @@ void GamePlayPage::drawCountdown(sf::RenderWindow& window)
 
 void GamePlayPage::stopGPBackGroundMusic()
 {
+    if (m_music->getStatus() == sf::SoundSource::Status::Playing ||
+        m_music->getStatus() == sf::SoundSource::Status::Paused)
+        m_music->stop(); // Also reset to the beginning of the song and thats why if paused
+}
+
+void GamePlayPage::pauseGPBackGroundMusic()
+{
     if (m_music->getStatus() == sf::SoundSource::Status::Playing)
-        m_music->stop();
+        m_music->pause();
 }
 
 void GamePlayPage::playGPBackGroundMusic()
@@ -401,3 +459,121 @@ void GamePlayPage::addScore(int linesCleared)
     }
     cout << m_score << endl;
 }
+
+int GamePlayPage::getScore() const
+{
+    return m_score;
+}
+
+void GamePlayPage::handleButtonClick(const Button btnClk)
+{
+    switch (btnClk)
+    {
+    case Button::Pause:
+        pauseGPBackGroundMusic();
+        m_pause = true;
+        // TODO?
+        break;
+    case Button::Play:
+        playGPBackGroundMusic();
+        m_pause = false;
+        // TODO?
+        break;
+    case Button::Retry:
+        stopGPBackGroundMusic();
+        clear();
+        break;
+    case Button::Home:
+        stopGPBackGroundMusic();
+        m_backToMenu = true;
+        break;
+    default:
+        break;
+    }
+}
+
+void GamePlayPage::setPauseText()
+{
+    // Generate random RGB values
+    int r = (rand() % 256),
+        g = (rand() % 256),
+        b = (rand() % 256);
+    sf::Color randomOutlineColor(r, g, b);
+
+    /*sf::Uint8 g = static_cast<sf::Uint8>(rand() % 256);
+    sf::Uint8 b = static_cast<sf::Uint8>(rand() % 256);*/
+
+    string msg = "Paused,\nPress 'Play' button to continue...";
+    m_pauseText.setString(msg);
+    m_pauseText.setCharacterSize(20); // Adjust to your preference
+    m_pauseText.setFillColor(sf::Color::White);
+    m_pauseText.setOutlineColor(randomOutlineColor);
+    m_pauseText.setOutlineThickness(2.f);
+
+    // Center text on the Board area (not the whole window)
+    sf::FloatRect bounds = m_pauseText.getLocalBounds();
+    m_pauseText.setOrigin(sf::Vector2f(bounds.size.x / 2.f, bounds.size.y / 2.f));
+
+    sf::Vector2f centerBoard;
+    centerBoard.x = m_board.getOffset().x + WIDTH * m_board.getBlockSize() / 2.f;
+    centerBoard.y = m_board.getOffset().y + HEIGHT * m_board.getBlockSize() / 2.f;
+
+    m_pauseText.setPosition(centerBoard);
+}
+
+void GamePlayPage::drawPauseText(sf::RenderWindow& window)
+{
+    //// 1️⃣ Determine center of Board
+    //sf::Vector2f centerBoard;
+    //centerBoard.x = m_board.getOffset().x + WIDTH * m_board.getBlockSize() / 2.f;
+    //centerBoard.y = m_board.getOffset().y + HEIGHT * m_board.getBlockSize() / 2.f;
+
+    //// 2️⃣ Draw "Paused" text, each character in random color
+    //std::string pausedStr = "Paused";
+    //float x = centerBoard.x - (pausedStr.size() * 15.f) / 2.f; // rough estimate for centering horizontally
+    //float y = centerBoard.y - 30.f; // move up a bit
+
+    //for (char c : pausedStr) {
+    //    sf::Text charText(ResourcesManager::get().getFont("main"));
+    //    charText.setString(c);
+    //    charText.setCharacterSize(40);
+
+    //    // Random color for fill
+    //    static int r = rand() % 256,
+    //        g = rand() % 256,
+    //        b = rand() % 256;
+    //    charText.setFillColor(sf::Color(r, g, b));
+
+    //    // Random color for outline (optional!)
+    //    static int rO = rand() % 256,
+    //        gO = rand() % 256,
+    //        bO = rand() % 256;
+    //    charText.setOutlineColor(sf::Color(rO, gO, bO));
+    //    charText.setOutlineThickness(2.f);
+
+    //    charText.setPosition(sf::Vector2f(x, y));
+    //    window.draw(charText);
+
+    //    // Move x for next char
+    //    x += charText.getLocalBounds().size.x + 1.f; // slight gap
+    //}
+
+    //// 3️⃣ Draw second line of pause text normally below
+    //std::string msg = "Press 'Play' button to continue...";
+    //sf::Text secondLine(ResourcesManager::get().getFont("main"));
+    //secondLine.setString(msg);
+    //secondLine.setCharacterSize(20);
+    //secondLine.setFillColor(sf::Color::White);
+
+    //sf::FloatRect bounds = secondLine.getLocalBounds();
+    //secondLine.setOrigin(sf::Vector2f(bounds.size.x / 2.f, bounds.size.y / 2.f));
+    //secondLine.setPosition(sf::Vector2f(centerBoard.x, centerBoard.y + 20.f)); // below "Paused"
+
+    //window.draw(secondLine);
+
+
+
+
+    window.draw(m_pauseText);
+}
+

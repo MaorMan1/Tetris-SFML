@@ -9,6 +9,14 @@ ButtonBackToMenu::ButtonBackToMenu()
     m_sprite.setTextureRect(m_buttonStatus[static_cast<int>(ButtonStatus::Normal)]);
 }
 
-void ButtonBackToMenu::onClick()
+Button ButtonBackToMenu::onClick()
 {
+    // TODO?
+    return Button::Home;
+}
+
+void ButtonBackToMenu::reset()
+{
+    m_currentStatus = ButtonStatus::Normal;
+    m_sprite.setTextureRect(m_buttonStatus[static_cast<int>(ButtonStatus::Normal)]);
 }

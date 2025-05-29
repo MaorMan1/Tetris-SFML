@@ -80,14 +80,13 @@ void Game::handlePageSwitching(sf::RenderWindow& window, const sf::Time deltaTim
     }
     else if(GamePlayPage* gp = dynamic_cast<GamePlayPage*>(m_currentPage)) {
         if (gp->wantsToReturn()) {
-            m_game->clear();
             goBackToMenuProcedure();
             pageSwitchSound.play(); 
             m_menu.get()->playMenuBackGroundMusic();
             // show gameover score and stuff
         }
         else {
-            gp->update(deltaTime); // Gameplay logic with gravity
+            gp->update(deltaTime, window); // Gameplay logic with gravity
         }
     }
 }
@@ -167,6 +166,7 @@ void Game::startMusicFade(const std::string& musicKey, float durationSeconds)
 
 void Game::goBackToMenuProcedure()
 {
+    m_game->clear();
     m_menu->resetSelection();
     m_currentPage = m_menu.get();
     m_about.get()->resetAboutPage();

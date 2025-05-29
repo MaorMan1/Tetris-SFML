@@ -62,7 +62,8 @@ enum class Button {
     Pause,
     Play,
     Retry,
-    Home
+    Home,
+    None
 };
 enum class ButtonStatus {
     Normal,

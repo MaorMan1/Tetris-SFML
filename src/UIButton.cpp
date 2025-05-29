@@ -1,7 +1,9 @@
 #include "UIButton.hpp"
 
 UIButton::UIButton():
-	m_sprite(ResourcesManager::get().getTexture("buttons")){}
+	m_sprite(ResourcesManager::get().getTexture("buttons")),
+	m_currentStatus(ButtonStatus::Normal)
+	{}
 
 void UIButton::draw(sf::RenderWindow& window, const int alpha) const
 {
@@ -12,18 +14,35 @@ void UIButton::draw(sf::RenderWindow& window, const int alpha) const
 	window.draw(sprite);
 }
 
-void UIButton::update(const sf::Vector2f& mousePos)
+void UIButton::update()
 {
+	m_sprite.setTextureRect(m_buttonStatus[static_cast<int>(m_currentStatus)]);
 	// ??
 
-	if (!isClicked(mousePos))
-		return;
+	/*if (!isClicked(mousePos))
+		return;*/
 
 }
 
 bool UIButton::isClicked(const sf::Vector2f& mousePos) const
 {
 	// ??
+	return true;
+}
+
+void UIButton::setHeldClicked(const bool isClicked)
+{
+	m_heldClick = isClicked;
+	m_currentStatus = (isClicked)? ButtonStatus::Clicked: ButtonStatus::Normal;
+}
+
+bool UIButton::isHeldClick() const
+{
+	return m_heldClick;
+}
+
+bool UIButton::isHovered(const sf::Vector2f& mousePos)
+{
 	return m_sprite.getGlobalBounds().contains(mousePos);
 }
 

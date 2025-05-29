@@ -9,9 +9,11 @@
 class ButtonPause : public UIButton {
 public:
     ButtonPause();
-    void onClick() override;
+    Button onClick() override;
+    void reset() override;
 
 private:
+    bool m_paused;
     std::vector<sf::IntRect> m_pauseSprites;
     std::vector<sf::IntRect> m_playSprites;
 };

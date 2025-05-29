@@ -64,6 +64,17 @@ sf::Vector2f UIBar::getUIBarOffset()
 	return m_UIBarOffset;
 }
 
+void UIBar::update() {
+	for (const auto& btn : m_buttons)
+		btn->update();
+}
+
+void UIBar::resetButtons()
+{
+	for (const auto& btn : m_buttons)
+		btn->reset();
+}
+
 void UIBar::draw(sf::RenderWindow& window, const int alpha)
 {
 	drawBackground(window, alpha);
@@ -73,6 +84,28 @@ void UIBar::draw(sf::RenderWindow& window, const int alpha)
 	for (const auto& btn : m_buttons) {
 		btn->draw(window, alpha);
 	}
+}
+
+// After found left button click 
+void UIBar::mouseButtonClick(const sf::Vector2f& mousePos)
+{
+	for (const auto& btn : m_buttons) {
+		if (!btn->isHeldClick() && btn->isHovered(mousePos)) {
+			btn->setHeldClicked(true);
+		}
+	}
+}
+
+// After found left button released 
+Button UIBar::mouseButtonHandle()
+{
+	for (const auto& btn : m_buttons) {
+		if (btn->isHeldClick()) {
+			btn->setHeldClicked(false);
+			return btn->onClick();
+		}
+	}
+	return Button::None;
 }
 
 void UIBar::drawBackground(sf::RenderWindow& window, int alpha)
@@ -106,3 +139,4 @@ void UIBar::updateNextPiece(CubePattern* nextPiece)
 {
 	m_nextPiece = nextPiece;
 }
+
