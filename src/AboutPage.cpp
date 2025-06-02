@@ -19,6 +19,8 @@ AboutPage::AboutPage(sf::RenderWindow& window):
     title.setString("About This Game:");
     title.setCharacterSize(40);
     title.setFillColor(sf::Color::Cyan);
+    title.setOutlineColor(sf::Color::Black);
+    title.setOutlineThickness(2);
     auto bounds = title.getLocalBounds();
     float x = (window.getSize().x - bounds.size.x) / 2.f;
     sf::Vector2f pos = { x, 100 };
@@ -38,6 +40,8 @@ AboutPage::AboutPage(sf::RenderWindow& window):
         "Enjoy!"
     );
     description.setCharacterSize(24);
+    description.setOutlineColor(sf::Color::Black);
+    description.setOutlineThickness(1);
     description.setFillColor(sf::Color::White);
     pos = { x, 200 };
     description.setPosition(pos);
@@ -47,6 +51,8 @@ AboutPage::AboutPage(sf::RenderWindow& window):
     backButton.setCharacterSize(30);
     backButton.setFillColor(sf::Color::White);
     pos = { 15,15 };
+    backButton.setOutlineColor(sf::Color::Black);
+    backButton.setOutlineThickness(2);
     backButton.setPosition(pos);
     sf::Vector2f v = { 1.05f, 1.05f };
     backButton.setScale(v);

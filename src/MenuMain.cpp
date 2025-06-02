@@ -46,6 +46,8 @@ MenuMain::MenuMain(sf::RenderWindow& window):
         auto bounds = m_menuOptions[i].getLocalBounds(); 
         float x = (windowWidth - static_cast<float>(bounds.size.x)) / 2.f;
         float y = startY + i * (charSize + 20); // 20 is vertical padding
+        m_menuOptions[i].setOutlineColor(sf::Color::Black);
+        m_menuOptions[i].setOutlineThickness(3);
         m_menuOptions[i].setPosition({ x, y });
     }
 
@@ -89,6 +91,9 @@ void MenuMain::handleEvent(const sf::Event &event, const sf::RenderWindow& windo
                     }
                     else if (option.getString() == "About") {
                         m_selected = MenuOptions::About;
+                    }
+                    else if (option.getString() == "Leaders board") {
+                        m_selected = MenuOptions::LeadersBoard;
                     }
                     else if (option.getString() == "Exit") {
                         m_selected = MenuOptions::Exit;

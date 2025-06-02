@@ -19,6 +19,7 @@ private:
     std::unique_ptr<MenuMain> m_menu;
     std::unique_ptr<AboutPage> m_about;
     std::unique_ptr<GamePlayPage> m_game;
+    std::unique_ptr<LeaderboardPage> m_leaderboard;
 
     Page* m_currentPage = nullptr;
 

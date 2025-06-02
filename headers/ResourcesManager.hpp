@@ -7,6 +7,7 @@
 #include <string>
 #include <memory>
 #include "DelayTimer.hpp"
+#include "Globals.hpp"
 
 class ResourcesManager {
 public:

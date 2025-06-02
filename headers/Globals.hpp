@@ -1,5 +1,6 @@
 #ifndef TETRIS_GLOBALS_HPP
 #define TETRIS_GLOBALS_HPP
+#include <iostream>
 
 
 
@@ -9,6 +10,9 @@ const int HEIGHT = 20;
 
 //UI Bar
 const int UI_WIDTH = 150;
+
+// Originally its working on ...//out//build//debug so go back 3 folders to the real resources folder:
+const std::string SCORESFILE = "../../../resources/scores.txt"; 
 
 //enum class GameState {
 //    Menu,

@@ -8,6 +8,8 @@
 #include "BaseAnimation.hpp"
 #include "FireTrailAnimation.hpp"
 #include "UIBar.hpp"
+#include "LeaderboardUtils.hpp"
+#include "LeaderBoardPage.hpp"
 
 class GamePlayPage : public Page {
 public:
@@ -17,6 +19,9 @@ public:
     void update(const sf::Time deltaTime, const sf::RenderWindow& window);  // Later: for gravity, score, game state
     CubePattern* getCurrentActivePiece() const;
     void clear();
+    sf::Sprite getGameOverSprite(const sf::Vector2u windowSize) const;
+    sf::Text getGameOverScore(const sf::Vector2u windowSize) const;
+
 
 private:
     Board m_board;
@@ -64,6 +69,7 @@ private:
     void handleButtonClick(const Button btnClk);
     void drawPauseText(sf::RenderWindow& window);
     void setPauseText();
+    void checkForHighScore();
 };
 
 #endif

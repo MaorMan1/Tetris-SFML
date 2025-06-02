@@ -14,7 +14,7 @@ void Game::run()
     m_menu = std::make_unique<MenuMain>(window);
     m_about = std::make_unique<AboutPage>(window);
     m_game = std::make_unique<GamePlayPage>(window);
-    // TODO - m_leaderboard ...
+    m_leaderboard = std::make_unique<LeaderboardPage>(window);
     Board board(window.getSize());
 
     m_currentPage = m_menu.get();
@@ -68,6 +68,11 @@ void Game::handlePageSwitching(sf::RenderWindow& window, const sf::Time deltaTim
             m_currentPage = m_game.get();
             m_game.get()->clear();
             break;
+        case MenuOptions::LeadersBoard:
+            pageSwitchSound.play();
+            m_leaderboard->loadScores(); // reload on open
+            m_currentPage = m_leaderboard.get();
+            break;
         default:
             break;
         }
@@ -88,6 +93,15 @@ void Game::handlePageSwitching(sf::RenderWindow& window, const sf::Time deltaTim
         else {
             gp->update(deltaTime, window); // Gameplay logic with gravity
         }
+    }
+    else if (LeaderboardPage* lb = dynamic_cast<LeaderboardPage*>(m_currentPage)) {
+        if (lb->wantsToReturn()) { // Back button clicked            
+            goBackToMenuProcedure();
+            pageSwitchSound.play();
+        }
+        //pageSwitchSound.play();
+        //m_leaderboard->loadScores(); // reload on open
+        //m_currentPage = m_leaderboard.get();
     }
 }
 
@@ -169,5 +183,6 @@ void Game::goBackToMenuProcedure()
     m_game->clear();
     m_menu->resetSelection();
     m_currentPage = m_menu.get();
-    m_about.get()->resetAboutPage();
+    m_about->resetAboutPage();
+    m_leaderboard->resetLBPage();
 }

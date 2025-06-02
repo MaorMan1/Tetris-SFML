@@ -23,7 +23,7 @@ add_executable(TetrisSFML
     src/MenuMain.cpp
     src/AboutPage.cpp
     src/ResourcesManager.cpp
- "src/DelayTimer.cpp" "src/GamePlayPage.cpp" "src/GravityTimer.cpp" "src/Pattern_O.cpp" "src/Pattern_T.cpp" "src/Pattern_J.cpp" "src/Pattern_L.cpp" "src/Pattern_S.cpp" "src/Pattern_Z.cpp" "src/LineClearAnimation.cpp" "src/ShakeManager.cpp" "src/FireTrailAnimation.cpp" "src/UIBar.cpp" "src/DisplayWindow.cpp" "src/UIButton.cpp" "src/ButtonRetry.cpp" "src/ButtonPause.cpp" "src/ButtonBackToMenu.cpp")
+ "src/DelayTimer.cpp" "src/GamePlayPage.cpp" "src/GravityTimer.cpp" "src/Pattern_O.cpp" "src/Pattern_T.cpp" "src/Pattern_J.cpp" "src/Pattern_L.cpp" "src/Pattern_S.cpp" "src/Pattern_Z.cpp" "src/LineClearAnimation.cpp" "src/ShakeManager.cpp" "src/FireTrailAnimation.cpp" "src/UIBar.cpp" "src/DisplayWindow.cpp" "src/UIButton.cpp" "src/ButtonRetry.cpp" "src/ButtonPause.cpp" "src/ButtonBackToMenu.cpp" "src/LeaderBoardUtils.cpp" "src/LeaderBoardPage.cpp")
 
 # Link SFML modules (modern usage)
 target_link_libraries(TetrisSFML 

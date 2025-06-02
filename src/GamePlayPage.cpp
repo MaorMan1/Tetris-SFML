@@ -191,6 +191,7 @@ void GamePlayPage::update(const sf::Time deltaTime, const sf::RenderWindow& wind
     }
     if (m_gameOver) {
         if (m_gameOverDelay.isDone()) {
+            checkForHighScore();
             m_backToMenu = true;
         }
         return;
@@ -201,9 +202,6 @@ void GamePlayPage::update(const sf::Time deltaTime, const sf::RenderWindow& wind
     }
 
     m_uiBar.update();
-
-    //const sf::Time deltaTime = sf::seconds(1.f / 60.f); // Target frame time (~60 FPS)
-
     m_shake.update(deltaTime);
     updateAnimations(deltaTime);
 
@@ -219,7 +217,6 @@ void GamePlayPage::update(const sf::Time deltaTime, const sf::RenderWindow& wind
     handleGravity();
 
     updateFireTrail(deltaTime);
-
 }
 
 void GamePlayPage::updateAnimations(sf::Time dt)
@@ -382,7 +379,9 @@ std::unique_ptr<CubePattern> GamePlayPage::reloadRandomPattern()
     }
 }
 
-void GamePlayPage::drawGameOverText(sf::RenderWindow& window) {
+// Set the game over's sprite and returns it
+sf::Sprite GamePlayPage::getGameOverSprite(const sf::Vector2u windowSize) const
+{
     sf::Sprite sprite(ResourcesManager::get().getTexture("game_over_pic"));
     auto GOFrame = sf::IntRect(sf::Vector2i(77, 0), sf::Vector2i(226, 62));
     sprite.setTextureRect(GOFrame);
@@ -390,13 +389,40 @@ void GamePlayPage::drawGameOverText(sf::RenderWindow& window) {
     sf::FloatRect bounds = sprite.getGlobalBounds();
     sprite.setPosition(
         sf::Vector2f(
-        window.getSize().x / 2.f - bounds.size.x / 2.f,
-        window.getSize().y / 3.f - bounds.size.y / 2.f
+            windowSize.x / 2.f - bounds.size.x / 2.f,
+            windowSize.y / 3.f - bounds.size.y / 2.f
         )
     );
-    // TODO: add score
-    window.draw(sprite);
+    return sprite;
 }
+
+// Set the game over's text and returns it
+sf::Text GamePlayPage::getGameOverScore(const sf::Vector2u windowSize) const
+{
+    sf::Text scoreText(ResourcesManager::get().getFont("main"));
+    scoreText.setString("Your score is: " + std::to_string(m_score));
+    scoreText.setCharacterSize(30);
+    scoreText.setFillColor(sf::Color::White);
+    scoreText.setOutlineColor(sf::Color::Black);
+    scoreText.setOutlineThickness(2);
+
+    sf::FloatRect scoreBounds = scoreText.getLocalBounds();
+    scoreText.setOrigin(sf::Vector2f(scoreBounds.size.x / 2.f, scoreBounds.size.y / 2.f));
+    scoreText.setPosition(sf::Vector2f(windowSize.x / 2.f, windowSize.y / 2.f));
+
+    return scoreText;
+}
+
+void GamePlayPage::drawGameOverText(sf::RenderWindow& window) {
+    // Draw the Game Over sprite
+    window.draw(getGameOverSprite(window.getSize()));
+
+    // Draw the score
+    window.draw(getGameOverScore(window.getSize()));
+
+    // TODO
+}
+
 
 void GamePlayPage::drawCountdown(sf::RenderWindow& window)
 {
@@ -472,12 +498,10 @@ void GamePlayPage::handleButtonClick(const Button btnClk)
     case Button::Pause:
         pauseGPBackGroundMusic();
         m_pause = true;
-        // TODO?
         break;
     case Button::Play:
         playGPBackGroundMusic();
         m_pause = false;
-        // TODO?
         break;
     case Button::Retry:
         stopGPBackGroundMusic();
@@ -500,9 +524,6 @@ void GamePlayPage::setPauseText()
         b = (rand() % 256);
     sf::Color randomOutlineColor(r, g, b);
 
-    /*sf::Uint8 g = static_cast<sf::Uint8>(rand() % 256);
-    sf::Uint8 b = static_cast<sf::Uint8>(rand() % 256);*/
-
     string msg = "Paused,\nPress 'Play' button to continue...";
     m_pauseText.setString(msg);
     m_pauseText.setCharacterSize(20); // Adjust to your preference
@@ -523,57 +544,24 @@ void GamePlayPage::setPauseText()
 
 void GamePlayPage::drawPauseText(sf::RenderWindow& window)
 {
-    //// 1️⃣ Determine center of Board
-    //sf::Vector2f centerBoard;
-    //centerBoard.x = m_board.getOffset().x + WIDTH * m_board.getBlockSize() / 2.f;
-    //centerBoard.y = m_board.getOffset().y + HEIGHT * m_board.getBlockSize() / 2.f;
-
-    //// 2️⃣ Draw "Paused" text, each character in random color
-    //std::string pausedStr = "Paused";
-    //float x = centerBoard.x - (pausedStr.size() * 15.f) / 2.f; // rough estimate for centering horizontally
-    //float y = centerBoard.y - 30.f; // move up a bit
-
-    //for (char c : pausedStr) {
-    //    sf::Text charText(ResourcesManager::get().getFont("main"));
-    //    charText.setString(c);
-    //    charText.setCharacterSize(40);
-
-    //    // Random color for fill
-    //    static int r = rand() % 256,
-    //        g = rand() % 256,
-    //        b = rand() % 256;
-    //    charText.setFillColor(sf::Color(r, g, b));
-
-    //    // Random color for outline (optional!)
-    //    static int rO = rand() % 256,
-    //        gO = rand() % 256,
-    //        bO = rand() % 256;
-    //    charText.setOutlineColor(sf::Color(rO, gO, bO));
-    //    charText.setOutlineThickness(2.f);
-
-    //    charText.setPosition(sf::Vector2f(x, y));
-    //    window.draw(charText);
-
-    //    // Move x for next char
-    //    x += charText.getLocalBounds().size.x + 1.f; // slight gap
-    //}
-
-    //// 3️⃣ Draw second line of pause text normally below
-    //std::string msg = "Press 'Play' button to continue...";
-    //sf::Text secondLine(ResourcesManager::get().getFont("main"));
-    //secondLine.setString(msg);
-    //secondLine.setCharacterSize(20);
-    //secondLine.setFillColor(sf::Color::White);
-
-    //sf::FloatRect bounds = secondLine.getLocalBounds();
-    //secondLine.setOrigin(sf::Vector2f(bounds.size.x / 2.f, bounds.size.y / 2.f));
-    //secondLine.setPosition(sf::Vector2f(centerBoard.x, centerBoard.y + 20.f)); // below "Paused"
-
-    //window.draw(secondLine);
-
-
-
-
     window.draw(m_pauseText);
 }
 
+void GamePlayPage::checkForHighScore() {
+    std::vector<ScoreEntry> scores;
+    loadScoresFromFile(SCORESFILE, scores);
+
+    if (scores.size() < 5 || m_score > scores.back().score) {
+        // Prompt user for name (simplified)
+        std::string name;
+        std::cout << "New high score! Enter your name: ";
+        std::cin >> name;
+
+        scores.push_back({ name, m_score });
+        std::sort(scores.begin(), scores.end());
+        if (scores.size() > 5)
+            scores.resize(5);
+
+        saveScoresToFile(SCORESFILE, scores);
+    }
+}
