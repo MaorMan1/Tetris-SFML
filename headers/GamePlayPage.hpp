@@ -21,7 +21,7 @@ public:
     void clear();
     sf::Sprite getGameOverSprite(const sf::Vector2u windowSize) const;
     sf::Text getGameOverScore(const sf::Vector2u windowSize) const;
-
+    void saveHighScore();
 
 private:
     Board m_board;
@@ -38,10 +38,17 @@ private:
     bool m_countdownActive;
     bool m_pause;
     int m_score = 0;
+    // checkc
+    bool m_highScoreEligible = false;
+    std::string m_enteredName;
 
     //added
     DelayTimer m_gameOverDelay;
     DelayTimer m_startDelay;
+
+    DelayTimer m_writingDelay;
+    bool m_writingLineShown = false;
+
     string m_lastNumCounted;
     sf::Text m_pauseText;
     sf::CircleShape m_hoverCircle;
@@ -69,7 +76,9 @@ private:
     void handleButtonClick(const Button btnClk);
     void drawPauseText(sf::RenderWindow& window);
     void setPauseText();
-    void checkForHighScore();
+    bool checkForHighScore();
+    void nameWritingNewHighScoreEvent(const sf::Event& event);
+    void drawNewScorePrompt(sf::RenderWindow& window);
 };
 
 #endif

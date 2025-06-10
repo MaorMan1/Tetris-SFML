@@ -36,6 +36,10 @@ GamePlayPage::GamePlayPage(sf::RenderWindow& window) :
 
 void GamePlayPage::handleEvent(const sf::Event& event, const sf::RenderWindow& window)
 {
+    // Name writing events in game over - new high score scenario.
+    if (m_gameOver && m_highScoreEligible) 
+        nameWritingNewHighScoreEvent(event);
+
     // Keyboard events
     if (!m_currentPiece) return;
     if (event.is<sf::Event::KeyPressed>()) {
@@ -78,8 +82,6 @@ void GamePlayPage::handleEvent(const sf::Event& event, const sf::RenderWindow& w
             handleButtonClick(m_uiBar.mouseButtonHandle());
         }
     }
-
-    // TODO - add later for mouse event if reset level or back to menu or pause
 }
 
 void GamePlayPage::draw(sf::RenderWindow& window)
@@ -190,8 +192,7 @@ void GamePlayPage::update(const sf::Time deltaTime, const sf::RenderWindow& wind
         return; // Don't update game until countdown done
     }
     if (m_gameOver) {
-        if (m_gameOverDelay.isDone()) {
-            checkForHighScore();
+        if (m_gameOverDelay.isDone() && !m_highScoreEligible) { 
             m_backToMenu = true;
         }
         return;
@@ -325,7 +326,9 @@ bool GamePlayPage::isGameOver()
         std::cout << piv.y << " " << piv.x << std::endl;
         if (m_board.getCell(piv.y, piv.x) != '_') {
             m_gameOver = true;
-            m_gameOverDelay.start(3.0f); // delay before switching page to menu 
+            if(!checkForHighScore())
+                m_gameOverDelay.start(3.0f); // delay before switching page to menu
+            //m_gameOverDelay.start(3.0f); // delay before switching page to menu ~~CHECK
             break;
         }
     }
@@ -420,7 +423,21 @@ void GamePlayPage::drawGameOverText(sf::RenderWindow& window) {
     // Draw the score
     window.draw(getGameOverScore(window.getSize()));
 
-    // TODO
+    // If eligible for top 5, draw name entry prompt
+    if (m_highScoreEligible) 
+        drawNewScorePrompt(window);
+}
+
+void GamePlayPage::saveHighScore() {
+    std::vector<ScoreEntry> scores;
+    loadScoresFromFile(SCORESFILE, scores);
+
+    scores.push_back({ m_enteredName, m_score });
+    std::sort(scores.begin(), scores.end());
+    if (scores.size() > 5)
+        scores.resize(5);
+
+    saveScoresToFile(SCORESFILE, scores);
 }
 
 
@@ -547,21 +564,66 @@ void GamePlayPage::drawPauseText(sf::RenderWindow& window)
     window.draw(m_pauseText);
 }
 
-void GamePlayPage::checkForHighScore() {
+bool GamePlayPage::checkForHighScore(){
     std::vector<ScoreEntry> scores;
     loadScoresFromFile(SCORESFILE, scores);
 
     if (scores.size() < 5 || m_score > scores.back().score) {
-        // Prompt user for name (simplified)
-        std::string name;
-        std::cout << "New high score! Enter your name: ";
-        std::cin >> name;
+        m_writingDelay.start(0.5f);
+        m_highScoreEligible = true;
+        m_enteredName.clear();
+    }
+    return m_highScoreEligible;
+}
 
-        scores.push_back({ name, m_score });
-        std::sort(scores.begin(), scores.end());
-        if (scores.size() > 5)
-            scores.resize(5);
+void GamePlayPage::drawNewScorePrompt(sf::RenderWindow& window)
+{
+    sf::Text namePrompt(ResourcesManager::get().getFont("main"));
+    namePrompt.setString("New High Score! Enter your name:");
+    namePrompt.setCharacterSize(20);
+    namePrompt.setFillColor(sf::Color::Yellow);
+    namePrompt.setPosition(sf::Vector2f(window.getSize().x / 2.f - 150.f, window.getSize().y / 2.f + 50.f));
 
-        saveScoresToFile(SCORESFILE, scores);
+    sf::Text nameEntry(ResourcesManager::get().getFont("main"));
+    if (m_writingLineShown)  // 1 sec delay from "|" to hide it
+        nameEntry.setString(m_enteredName);
+    else
+        nameEntry.setString(m_enteredName + "|");
+
+    if (m_writingDelay.isDone()) {
+        m_writingLineShown = !m_writingLineShown;
+        m_writingDelay.start(0.5f);
+    }
+    nameEntry.setCharacterSize(24);
+    nameEntry.setFillColor(sf::Color::Cyan);
+    nameEntry.setPosition(sf::Vector2f(window.getSize().x / 2.f - 150.f, window.getSize().y / 2.f + 80.f));
+
+    sf::Text pressPrompt(ResourcesManager::get().getFont("main"));
+    pressPrompt.setString("Press 'Enter' to continue..");
+    pressPrompt.setCharacterSize(20);
+    pressPrompt.setFillColor(sf::Color::Yellow);
+    pressPrompt.setPosition(sf::Vector2f(window.getSize().x / 2.f - 150.f, window.getSize().y / 2.f + 110.f));
+
+    window.draw(namePrompt);
+    window.draw(nameEntry);
+    window.draw(pressPrompt);
+}
+
+void GamePlayPage::nameWritingNewHighScoreEvent(const sf::Event& event)
+{
+    if (event.is<sf::Event::TextEntered>()) {
+        auto unicode = event.getIf<sf::Event::TextEntered>()->unicode;
+        if (unicode == '\b') { // Backspace
+            if (!m_enteredName.empty())
+                m_enteredName.pop_back();
+        }
+        else if (unicode == '\r' || unicode == '\n') { // Enter
+            saveHighScore();
+            m_highScoreEligible = false;
+            m_gameOverDelay.start(0.7f); // delay before switching page to menu
+        }
+        else if (m_enteredName.size() < 10 && unicode < 128) { // Limit name length
+            m_enteredName += static_cast<char>(unicode);
+        }
     }
 }

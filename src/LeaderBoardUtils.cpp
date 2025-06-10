@@ -34,7 +34,7 @@ void saveScoresToFile(const std::string& filePath, const std::vector<ScoreEntry>
     }
 
     //debugging
-    std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
+    /*std::cout << "Current path: " << std::filesystem::current_path() << std::endl;*/
 
 
     for (const auto& entry : scores) {
