@@ -128,6 +128,11 @@ void GamePlayPage::draw(sf::RenderWindow& window)
     m_board.draw(window);
     m_uiBar.draw(window);
 
+    // check
+    for (const auto& popup : m_scorePopups) {
+        popup.draw(window);
+    }
+
     // For safe usage
     if (!m_nextPiece) 
         m_nextPiece = reloadRandomPattern();
@@ -206,6 +211,15 @@ void GamePlayPage::update(const sf::Time deltaTime, const sf::RenderWindow& wind
     m_uiBar.update();
     m_shake.update(deltaTime);
     updateAnimations(deltaTime);
+
+    // check - Update score popups
+    for (auto it = m_scorePopups.begin(); it != m_scorePopups.end(); ) {
+        it->update(deltaTime);
+        if (it->isFinished())
+            it = m_scorePopups.erase(it);
+        else
+            ++it;
+    }
 
     if (!m_animations.empty())
         return; // Wait for all animations to complete
@@ -491,14 +505,28 @@ void GamePlayPage::playGPBackGroundMusic()
 
 void GamePlayPage::addScore(int linesCleared)
 {
+    int scoreToAdd = 0;
     switch (linesCleared) {
-    case 1: m_score += 100; break;
-    case 2: m_score += 300; break;
-    case 3: m_score += 500; break;
-    case 4: m_score += 800; break;
+    case 1: scoreToAdd = 100; break;
+    case 2: scoreToAdd = 300; break;
+    case 3: scoreToAdd = 500; break;
+    case 4: scoreToAdd = 800; break;
     default: break;
     }
-    cout << m_score << endl;
+    m_score += scoreToAdd;
+
+    if (scoreToAdd == 0) return;
+
+    //TODO SOUND EFFECT!!!
+    //TODO NEW FONT
+
+    sf::Vector2f centerBoard = {
+    m_board.getOffset().x + WIDTH * m_board.getBlockSize() / 2.f,
+    m_board.getOffset().y + HEIGHT * m_board.getBlockSize() / 2.f
+    };
+
+    std::string text = "+" + std::to_string(scoreToAdd);
+    m_scorePopups.emplace_back(ResourcesManager::get().getFont("main"), centerBoard, text);
 }
 
 int GamePlayPage::getScore() const

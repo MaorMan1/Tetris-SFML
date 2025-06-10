@@ -10,6 +10,7 @@
 #include "UIBar.hpp"
 #include "LeaderboardUtils.hpp"
 #include "LeaderBoardPage.hpp"
+#include "ScorePopup.hpp"
 
 class GamePlayPage : public Page {
 public:
@@ -31,6 +32,8 @@ private:
     ShakeManager m_shake;
     std::vector<std::unique_ptr<BaseAnimation>> m_animations;
     std::unique_ptr<FireTrailAnimation> m_fireTrail;
+    // check
+    std::vector<ScorePopup> m_scorePopups; // Its a vector for scenario of fast 2 clears
 
     bool m_downHeld;
     //bool m_mouseLeftHeld;
