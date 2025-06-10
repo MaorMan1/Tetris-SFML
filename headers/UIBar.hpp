@@ -12,6 +12,7 @@
 #include "ButtonRetry.hpp"
 #include "ButtonPause.hpp"
 #include "ButtonBackToMenu.hpp"
+#include "ButtonMute.hpp"
 
 // Forward declarations
 class CubePattern;

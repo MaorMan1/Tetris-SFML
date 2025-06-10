@@ -21,7 +21,6 @@ Button ButtonPause::onClick()
 {
     m_buttonStatus = (m_paused) ? m_pauseSprites: m_playSprites;    // Change Play/Pause sprites
     m_paused = !m_paused;
-    // TODO continue?
 
     if (m_paused) 
         return Button::Pause;

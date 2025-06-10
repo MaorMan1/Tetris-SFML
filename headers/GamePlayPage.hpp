@@ -55,6 +55,7 @@ private:
     //LineClearAnimation m_lineClearAnimation;  
     std::set<int> m_pendingClearLines; 
     sf::Music* m_music = nullptr;
+    //float m_musicOri
     UIBar m_uiBar;
 
     //helpers

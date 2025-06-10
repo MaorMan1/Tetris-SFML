@@ -11,6 +11,7 @@ const int HEIGHT = 20;
 //UI Bar
 const int UI_WIDTH = 150;
 
+
 // Originally its working on ...//out//build//debug so go back 3 folders to the real resources folder:
 const std::string SCORESFILE = "../../../resources/scores.txt"; 
 
@@ -67,6 +68,8 @@ enum class Button {
     Play,
     Retry,
     Home,
+    Mute,
+    Unmute,
     None
 };
 enum class ButtonStatus {

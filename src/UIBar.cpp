@@ -29,6 +29,7 @@ UIBar::UIBar(sf::Vector2u windowSize, const float blockSize, const sf::Vector2f 
 	m_buttons.emplace_back(std::make_unique<ButtonPause>());
 	m_buttons.emplace_back(std::make_unique<ButtonBackToMenu>());
 	m_buttons.emplace_back(std::make_unique<ButtonRetry>());
+	m_buttons.emplace_back(std::make_unique<ButtonMute>());
 
 	positionButtons(windowSize, space);
 }

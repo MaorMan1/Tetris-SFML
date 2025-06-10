@@ -177,6 +177,7 @@ void GamePlayPage::clear()
     m_score = 0;
     m_uiBar.updateScore(m_score);
     m_uiBar.resetButtons();
+    m_music->setVolume(100.f); // 100% volume
 }
 
 void GamePlayPage::update(const sf::Time deltaTime, const sf::RenderWindow& window)
@@ -279,7 +280,6 @@ void GamePlayPage::handleGravity()
         else {
             m_currentPiece = spawnNextPattern();
             if (isGameOver()){
-                // TODO - reset score after check for leaderboard
                 stopGPBackGroundMusic();
                 m_currentPiece.reset();
             }
@@ -328,7 +328,6 @@ bool GamePlayPage::isGameOver()
             m_gameOver = true;
             if(!checkForHighScore())
                 m_gameOverDelay.start(3.0f); // delay before switching page to menu
-            //m_gameOverDelay.start(3.0f); // delay before switching page to menu ~~CHECK
             break;
         }
     }
@@ -440,7 +439,6 @@ void GamePlayPage::saveHighScore() {
     saveScoresToFile(SCORESFILE, scores);
 }
 
-
 void GamePlayPage::drawCountdown(sf::RenderWindow& window)
 {
     float secondsLeft = m_startDelay.getDuration().asSeconds() - m_startDelay.getElapsed().asSeconds();
@@ -527,6 +525,12 @@ void GamePlayPage::handleButtonClick(const Button btnClk)
     case Button::Home:
         stopGPBackGroundMusic();
         m_backToMenu = true;
+        break;
+    case Button::Mute:
+        m_music->setVolume(0.f); // 0% volume
+        break;
+    case Button::Unmute:
+        m_music->setVolume(100.f); // 100% volume
         break;
     default:
         break;
