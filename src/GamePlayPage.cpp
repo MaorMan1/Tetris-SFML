@@ -9,6 +9,7 @@
 
 GamePlayPage::GamePlayPage(sf::RenderWindow& window) :
     m_music(&ResourcesManager::get().getMusic("game_play_music")),
+    m_gameOverMusic(&ResourcesManager::get().getMusic("game_over")),
     m_board(window.getSize()),
     m_nextPiece(reloadRandomPattern()),
     m_fireTrail(std::make_unique<FireTrailAnimation>()),
@@ -295,6 +296,10 @@ void GamePlayPage::handleGravity()
             m_currentPiece = spawnNextPattern();
             if (isGameOver()){
                 stopGPBackGroundMusic();
+                // Set and play game over's music
+                m_gameOverMusic->setVolume(100);    // The fading music in previous round made it 0%
+                m_gameOverMusic->play();    // Restarting it
+
                 m_currentPiece.reset();
             }
             //m_gravity.speedUp();
@@ -337,7 +342,6 @@ bool GamePlayPage::isGameOver()
 {
     const auto& newPieceCheck = m_currentPiece.get()->getPatternPositions(m_currentPiece.get()->getPivot());
     for (const auto& piv : newPieceCheck) {
-        std::cout << piv.y << " " << piv.x << std::endl;
         if (m_board.getCell(piv.y, piv.x) != '_') {
             m_gameOver = true;
             if(!checkForHighScore())
@@ -474,6 +478,8 @@ void GamePlayPage::drawCountdown(sf::RenderWindow& window)
     text.setString(m_lastNumCounted);
     text.setCharacterSize(100);
     text.setFillColor(sf::Color::White);
+    text.setOutlineColor(sf::Color::Red);
+    text.setOutlineThickness(5);
 
     // Center the text
     sf::FloatRect bounds = text.getLocalBounds();
@@ -659,3 +665,4 @@ void GamePlayPage::nameWritingNewHighScoreEvent(const sf::Event& event)
         }
     }
 }
+

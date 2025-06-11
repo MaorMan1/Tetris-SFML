@@ -1,5 +1,5 @@
-Maorr:3000
-Maorr:1800
-maor_man:600
-jj:600
-MM:300
+Maor:600
+David:200
+mm:100
+mm:100
+Mm:0

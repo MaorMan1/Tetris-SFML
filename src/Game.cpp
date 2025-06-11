@@ -67,6 +67,7 @@ void Game::handlePageSwitching(sf::RenderWindow& window, const sf::Time deltaTim
             m_menu.get()->resetSelection();
             m_currentPage = m_game.get();
             m_game.get()->clear();
+            //ResourcesManager::get().getMusic("game_over").stop();
             break;
         case MenuOptions::LeadersBoard:
             pageSwitchSound.play();
@@ -88,7 +89,7 @@ void Game::handlePageSwitching(sf::RenderWindow& window, const sf::Time deltaTim
             goBackToMenuProcedure();
             pageSwitchSound.play(); 
             m_menu.get()->playMenuBackGroundMusic();
-            // show gameover score and stuff
+            startMusicFade("game_over", 1.0f);
         }
         else {
             gp->update(deltaTime, window); // Gameplay logic with gravity
@@ -117,13 +118,13 @@ void Game::loadResources()
         ResourcesManager::get().loadSound("before_explosion", "resources/BeforeExplosion.wav");
         ResourcesManager::get().loadSound("explosion_sound", "resources/ClearLineExplosion.wav");
         ResourcesManager::get().loadMusic("game_play_music", "resources/GamePlayMusic.ogg");
-        // TODO: change this horrible sound:
         ResourcesManager::get().loadSound("lock_piece", "resources/LockPiecec.wav");
         ResourcesManager::get().loadTexture("block_explosion", "resources/TetrisBlockExplosion.png");
         ResourcesManager::get().loadTexture("game_over_pic","resources/GameOverSign.png");
         ResourcesManager::get().loadTexture("fire_trail", "resources/MovingDownFastNew.png");
         ResourcesManager::get().loadTexture("ui_bar_bg", "resources/BarBG.png");
         ResourcesManager::get().loadTexture("buttons", "resources/Buttons.png");
+        ResourcesManager::get().loadMusic("game_over", "resources/GameOverMusic.ogg");
         // Robotic counter sounds:
         ResourcesManager::get().loadSound("3", "resources/3Count.wav");
         ResourcesManager::get().loadSound("2", "resources/2Count.wav");
