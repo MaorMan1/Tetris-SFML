@@ -77,4 +77,13 @@ enum class ButtonStatus {
     Clicked,
     Hovered
 };
+
+enum class FunnyMemes {
+    Nice,
+    Omg,
+    Wow,
+    YeahBoy,
+    Breakfast,
+    Amount
+};
 #endif 

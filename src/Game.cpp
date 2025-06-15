@@ -130,6 +130,12 @@ void Game::loadResources()
         ResourcesManager::get().loadSound("2", "resources/2Count.wav");
         ResourcesManager::get().loadSound("1", "resources/1Count.wav");
         ResourcesManager::get().loadSound("Go!", "resources/GoCount.wav");
+        // Success sound effects to clear lines:
+        ResourcesManager::get().loadSound("nice", "resources/NiceSound.wav");
+        ResourcesManager::get().loadSound("omg", "resources/OMGSound.wav");
+        ResourcesManager::get().loadSound("wow", "resources/WowSound.wav");
+        ResourcesManager::get().loadSound("yeah_boy", "resources/YeahBoySound.wav");
+        ResourcesManager::get().loadSound("breakfast", "resources/BreakfastSound.wav");
     }
     catch (const std::exception& e) {
         std::cerr << "Resource error: " << e.what() << std::endl;

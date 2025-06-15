@@ -18,6 +18,7 @@ GamePlayPage::GamePlayPage(sf::RenderWindow& window) :
     m_pause(false),
     m_pauseText(ResourcesManager::get().getFont("main")),
     m_countdownActive(true),
+    m_muted(false),
     m_uiBar(window.getSize(), m_board.getBlockSize(), m_board.getOffset())/*,
     m_mouseLeftHeld(false)*/
 {
@@ -184,6 +185,7 @@ void GamePlayPage::clear()
     m_uiBar.updateScore(m_score);
     m_uiBar.resetButtons();
     m_music->setVolume(100.f); // 100% volume
+    m_muted = false;
 }
 
 void GamePlayPage::update(const sf::Time deltaTime, const sf::RenderWindow& window)
@@ -207,6 +209,11 @@ void GamePlayPage::update(const sf::Time deltaTime, const sf::RenderWindow& wind
     if (m_pause) {
         m_uiBar.update();
         return;
+    }
+    if (m_memePlaying && m_memeTimer.isDone()) {
+        if(!m_muted)
+            m_music->setVolume(100.f);
+        m_memePlaying = false;
     }
 
     m_uiBar.update();
@@ -274,12 +281,12 @@ void GamePlayPage::handleGravity()
         m_currentPiece->moveDown(m_board);
     }
     else {
-        ResourcesManager::get().getSound("lock_piece").play();
         if (m_fireTrail) m_fireTrail->stop();
         auto affectedRows = m_board.lockPiece(*m_currentPiece);
         auto fullLines = m_board.findFullLines(affectedRows);
 
         if (!fullLines.empty()) {
+            playRandomFunnyMeme();
             addScore(static_cast<int>(fullLines.size()));
             m_uiBar.updateScore(m_score);
             m_board.clearLinesFromGrid(fullLines);
@@ -293,6 +300,7 @@ void GamePlayPage::handleGravity()
             m_currentPiece.reset(); // Wait for clear to spawn new one
         }
         else {
+            ResourcesManager::get().getSound("lock_piece").play();  // Stick pattern sound
             m_currentPiece = spawnNextPattern();
             if (isGameOver()){
                 stopGPBackGroundMusic();
@@ -561,9 +569,11 @@ void GamePlayPage::handleButtonClick(const Button btnClk)
         m_backToMenu = true;
         break;
     case Button::Mute:
+        m_muted = true;
         m_music->setVolume(0.f); // 0% volume
         break;
     case Button::Unmute:
+        m_muted = false;
         m_music->setVolume(100.f); // 100% volume
         break;
     default:
@@ -645,6 +655,42 @@ void GamePlayPage::drawNewScorePrompt(sf::RenderWindow& window)
     window.draw(namePrompt);
     window.draw(nameEntry);
     window.draw(pressPrompt);
+}
+
+void GamePlayPage::playRandomFunnyMeme()
+{
+    int meme = rand() % static_cast<int>(FunnyMemes::Amount);
+    auto& sound = ResourcesManager::get().getSound(memeConverter(meme));
+    sound.setVolume(100);
+    sound.play();
+
+    if (m_muted) return;    // No need to decrease volume if muted
+
+    // Lower the background music volume
+    m_music->setVolume(15.f);
+    m_memeTimer.start(1.5f);  // Start a 1.5 second delay(more or less)
+    m_memePlaying = true;
+}
+
+std::string GamePlayPage::memeConverter(const int& meme) const
+{
+    auto m = static_cast<FunnyMemes>(meme);
+    switch (m)
+    {
+    case FunnyMemes::Breakfast:
+        return "breakfast";
+    case FunnyMemes::Nice:
+        return "nice";
+    case FunnyMemes::Omg:
+        return "omg";
+    case FunnyMemes::Wow:
+        return "wow";
+    case FunnyMemes::YeahBoy:
+        return "yeah_boy";
+    default:
+        break;
+    }
+    return "nice";  // Default for safety
 }
 
 void GamePlayPage::nameWritingNewHighScoreEvent(const sf::Event& event)

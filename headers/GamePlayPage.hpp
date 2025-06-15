@@ -41,9 +41,10 @@ private:
     bool m_countdownActive;
     bool m_pause;
     int m_score = 0;
-    // checkc
     bool m_highScoreEligible = false;
     std::string m_enteredName;
+    bool m_muted;
+    
 
     //added
     DelayTimer m_gameOverDelay;
@@ -51,15 +52,16 @@ private:
 
     DelayTimer m_writingDelay;
     bool m_writingLineShown = false;
+    //checkk
+    DelayTimer m_memeTimer;
+    bool m_memePlaying = false;
 
     string m_lastNumCounted;
     sf::Text m_pauseText;
-    sf::CircleShape m_hoverCircle;
-    //LineClearAnimation m_lineClearAnimation;  
+    sf::CircleShape m_hoverCircle; 
     std::set<int> m_pendingClearLines; 
     sf::Music* m_music = nullptr;
     sf::Music* m_gameOverMusic = nullptr;
-    //float m_musicOri
     UIBar m_uiBar;
 
     //helpers
@@ -84,6 +86,8 @@ private:
     bool checkForHighScore();
     void nameWritingNewHighScoreEvent(const sf::Event& event);
     void drawNewScorePrompt(sf::RenderWindow& window);
+    void playRandomFunnyMeme();
+    std::string memeConverter(const int& meme) const;
 };
 
 #endif

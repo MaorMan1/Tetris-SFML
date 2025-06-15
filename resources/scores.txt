@@ -1,5 +1,5 @@
+MM:5000
+MaorMan:3100
+llo:2800
+New_Player:700
 Maor:600
-David:200
-mm:100
-mm:100
-Mm:0
