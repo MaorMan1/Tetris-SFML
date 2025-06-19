@@ -193,7 +193,6 @@ void GamePlayPage::update(const sf::Time deltaTime, const sf::RenderWindow& wind
     if (m_countdownActive) {
         if (m_startDelay.isDone()) {
             m_countdownActive = false;
-            //m_nextPiece = reloadRandomPattern();
             m_currentPiece = spawnNextPattern(); // spawn after countdown
             playGPBackGroundMusic();
             m_gravity.start(1.f);
@@ -482,19 +481,52 @@ void GamePlayPage::drawCountdown(sf::RenderWindow& window)
         m_lastNumCounted = displayText;
         ResourcesManager::get().getSound(m_lastNumCounted).play();
     }
+    //sf::Text text(ResourcesManager::get().getFont("main"));
+    //text.setString(m_lastNumCounted);
+    //text.setCharacterSize(100);
+    //text.setFillColor(sf::Color::White);
+    //text.setOutlineColor(sf::Color::Red);
+    //text.setOutlineThickness(5);
+
+    //// Center the text
+    //sf::FloatRect bounds = text.getLocalBounds();
+    //text.setOrigin(sf::Vector2f(bounds.size.x / 2.f, bounds.size.y / 2.f));
+    //text.setPosition(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
+
+    //window.draw(text);
+    sf::Text shadow(ResourcesManager::get().getFont("main"));
     sf::Text text(ResourcesManager::get().getFont("main"));
     text.setString(m_lastNumCounted);
-    text.setCharacterSize(100);
-    text.setFillColor(sf::Color::White);
-    text.setOutlineColor(sf::Color::Red);
-    text.setOutlineThickness(5);
+    shadow.setString(m_lastNumCounted);
 
-    // Center the text
+    text.setCharacterSize(120);
+    shadow.setCharacterSize(120);
+
+    // Main color
+    if (m_lastNumCounted == "Go!")
+        text.setFillColor(sf::Color(255, 255, 100));  // Yellowish for "Go!"
+    else
+        text.setFillColor(sf::Color(255, 215, 0));    // Gold for numbers
+
+    // Outlines and shadow
+    text.setOutlineColor(sf::Color::Black);
+    text.setOutlineThickness(6);
+
+    shadow.setFillColor(sf::Color(0, 0, 0, 150)); // Semi-transparent black shadow
+    shadow.setPosition(sf::Vector2f(5.f, 5.f)); // Slight offset for shadow
+
+    // Center origin and position
     sf::FloatRect bounds = text.getLocalBounds();
+    sf::Vector2f center(window.getSize().x / 2.f, window.getSize().y / 2.f);
     text.setOrigin(sf::Vector2f(bounds.size.x / 2.f, bounds.size.y / 2.f));
-    text.setPosition(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
+    shadow.setOrigin(sf::Vector2f(bounds.size.x / 2.f, bounds.size.y / 2.f));
 
-    window.draw(text);
+    text.setPosition(center);
+    shadow.setPosition(center + sf::Vector2f(20.f, 10.f)); // offset for depth
+
+    // Draw
+    window.draw(shadow);  // behind
+    window.draw(text);    // front
 }
 
 void GamePlayPage::stopGPBackGroundMusic()
@@ -530,9 +562,6 @@ void GamePlayPage::addScore(int linesCleared)
     m_score += scoreToAdd;
 
     if (scoreToAdd == 0) return;
-
-    //TODO SOUND EFFECT!!!
-    //TODO NEW FONT
 
     sf::Vector2f centerBoard = {
     m_board.getOffset().x + WIDTH * m_board.getBlockSize() / 2.f,

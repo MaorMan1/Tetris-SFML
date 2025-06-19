@@ -1,4 +1,4 @@
-#include "AboutPage.hpp"
+﻿#include "AboutPage.hpp"
 
 AboutPage::AboutPage(sf::RenderWindow& window):
     m_hoverBack(false),
@@ -28,16 +28,16 @@ AboutPage::AboutPage(sf::RenderWindow& window):
 
     //description setup
     description.setString(
-        "This is a Tetris remake project.\n"
-        "Made by Maor Man with C++ and SFML.\n"
-        "For learning and fun!\n\n"
-        "Keys:\n"
-        "Left key: Moving left.\n"
-        "Right key: Moving right.\n"
-        "Down key: Moving down faster.\n"
-        "Up key: For rotating piece.\n\n"
-        "The rules you already know :)\n"
-        "Enjoy!"
+        "Tetris Remake by Maor Man\n"
+        "Built with C++ and SFML.\n"
+        "Created for learning and fun!\n\n"
+        "Controls:\n"
+        "Left Arrow  - Move left\n"
+        "Right Arrow - Move right\n"
+        "Down Arrow  - Soft drop\n"
+        "Up Arrow    - Rotate\n\n"
+        "You know the rules ;)\n"
+        "Have fun and enjoy!"
     );
     description.setCharacterSize(24);
     description.setOutlineColor(sf::Color::Black);

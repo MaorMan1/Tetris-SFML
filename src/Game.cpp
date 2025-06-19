@@ -113,7 +113,7 @@ void Game::loadResources()
         ResourcesManager::get().loadMusic("menu", "resources/Menu_Music.ogg");
         ResourcesManager::get().loadSound("page_transition", "resources/SwitchPage.wav");
         ResourcesManager::get().loadSound("mouse_click", "resources/MouseClick.wav");
-        ResourcesManager::get().loadTexture("menu_bg_pic", "resources/menuBackGroundPic.jpeg");
+        ResourcesManager::get().loadTexture("menu_bg_pic", "resources/menuBackGroundPicNew.png");
         ResourcesManager::get().loadTexture("about_bg_pic", "resources/aboutPageBGPic.jpeg");
         ResourcesManager::get().loadSound("before_explosion", "resources/BeforeExplosion.wav");
         ResourcesManager::get().loadSound("explosion_sound", "resources/ClearLineExplosion.wav");

@@ -21,9 +21,12 @@ public:
 
 private:
     const sf::Font& m_font;
+	sf::Color  m_fillColor;
+	sf::Color  m_outlineColor;
 	std::vector<sf::Text> m_menuOptions;
 	MenuOptions m_selected;
 	sf::Music* m_music = nullptr;
 	sf::Sprite m_menuBGSprite;
+	std::string m_pendingClick;
 };
 #endif

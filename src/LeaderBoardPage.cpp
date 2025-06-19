@@ -19,9 +19,9 @@ LeaderboardPage::LeaderboardPage(sf::RenderWindow& window) :
     sf::Text title(m_font);
     title.setString("Top 5 Scores:");
     title.setCharacterSize(40);
-    title.setFillColor(sf::Color::Cyan);
+    title.setFillColor(sf::Color(25, 25, 110));   // Indigo fill
+    title.setOutlineColor(sf::Color(0, 0, 40));   // Dark outline
     title.setOutlineThickness(2);
-    title.setOutlineColor(sf::Color::Blue);
     auto bounds = title.getLocalBounds();
     title.setPosition(sf::Vector2f((window.getSize().x - bounds.size.x) / 2.f, 50.f));
 
