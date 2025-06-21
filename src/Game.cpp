@@ -9,6 +9,19 @@ void Game::run()
 
     // Create the main window
     sf::RenderWindow window(sf::VideoMode({ 800, 600 }), "Tetris remake");
+    sf::Image icon;
+    if (!icon.loadFromFile("resources/Icon.png")) {
+        std::cerr << "Couldn't load icon!" << std::endl;
+        return;
+    }
+    try {
+        window.setIcon(icon);
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error setting window icon: " << e.what() << std::endl;
+        return;
+    }
+
     loadResources();
 
     m_menu = std::make_unique<MenuMain>(window);
@@ -46,6 +59,14 @@ void Game::run()
     }
 }
 
+Game::~Game() {
+    // All unique_ptrs will clean up automatically.
+    // Stop any music if still playing.
+    if (m_musicToFade) {
+        m_musicToFade->stop();
+    }
+}
+
 void Game::handlePageSwitching(sf::RenderWindow& window, const sf::Time deltaTime)
 {
     auto& pageSwitchSound = ResourcesManager::get().getSound("page_transition");
@@ -67,7 +88,6 @@ void Game::handlePageSwitching(sf::RenderWindow& window, const sf::Time deltaTim
             m_menu.get()->resetSelection();
             m_currentPage = m_game.get();
             m_game.get()->clear();
-            //ResourcesManager::get().getMusic("game_over").stop();
             break;
         case MenuOptions::LeadersBoard:
             pageSwitchSound.play();

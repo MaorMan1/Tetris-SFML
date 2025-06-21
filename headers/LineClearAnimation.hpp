@@ -9,13 +9,19 @@
 #include "Globals.hpp"
 #include "BaseAnimation.hpp"
 
-// Represents the animation state of a single block during line clearing
+/**
+ * @struct ExplosionBlock
+ * @brief Represents an individual block's animation state during a line clear.
+ */
 struct ExplosionBlock {
     int frame = 0;    // Current animation frame index
     bool active = false; // Whether this block has started animating
 };
 
-// Allows std::pair<int,int> to be used as a key in unordered_map
+/**
+ * @struct pair_hash
+ * @brief Hash function for std::pair<int, int> used as key in unordered_map.
+ */
 struct pair_hash {
     template <class T1, class T2>
     std::size_t operator()(const std::pair<T1, T2>& p) const {
@@ -25,8 +31,19 @@ struct pair_hash {
     }
 };
 
+/**
+ * @class LineClearAnimation
+ * @brief Handles the explosion animation for cleared lines in Tetris.
+ *
+ * The animation activates column-by-column and progresses through
+ * explosion sprite frames, ending after all cells finish animating.
+ */
 class LineClearAnimation : public BaseAnimation{
 public:
+    /**
+     * @brief Begins the explosion effect on the given rows.
+     * @param rowsToClear Set of row indices to animate.
+     */
     LineClearAnimation();
 
     // Starts an explosion animation for the given cleared rows

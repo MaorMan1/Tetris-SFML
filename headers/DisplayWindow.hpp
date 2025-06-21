@@ -10,6 +10,13 @@
 // Forward declaration
 class CubePattern;
 
+/*
+ * DisplayWindow represents a UI panel to show score or next piece.
+ * It can draw text values (e.g., score) or Tetris pieces with transparency.
+ * Use setValue() to update displayed text, and setTitle() for its label.
+ *
+ * If used for next pattern display, pass a CubePattern pointer to draw().
+ */
 class DisplayWindow {
 public:
     DisplayWindow(sf::Vector2f position, sf::Vector2f size, const std::string& title = "", DisplaysOptions option = DisplaysOptions::Score);
@@ -19,6 +26,7 @@ public:
     void draw(sf::RenderWindow& window, const int alpha = 255, const CubePattern* piece = nullptr, const float blockSize = 0.f) const;
     sf::Vector2f getPosition() const;
     sf::Vector2f getSize() const;
+    // Used when drawing CubePattern inside this display
     sf::Vector2i getDispPivot() const;
     sf::Vector2f getCenter() const;
 

@@ -6,10 +6,15 @@
 #include "UIButton.hpp"
 #include "Globals.hpp"
 
+// Button to return to main menu (Home)
 class ButtonBackToMenu : public UIButton {
 public:
     ButtonBackToMenu();
+
+    // What happens when button is clicked
     Button onClick() override;
+
+    // Reset button state (called after navigation or UI reset)
     void reset() override;
 };
 

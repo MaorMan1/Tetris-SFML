@@ -2,4 +2,4 @@ MM:5000
 MaorMan:3100
 JJ:3000
 llo:2800
-Dani:900
+NewPlayer:1000

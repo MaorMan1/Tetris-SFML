@@ -4,13 +4,28 @@
 #include "Board.hpp"
 #include "CubePattern.hpp"
 
+/**
+ * @class Pattern_T
+ * @brief Represents the T-shaped Tetris piece.
+ *
+ * Defines four rotation states and wall kick offsets for the T tetromino.
+ */
 class Pattern_T : public CubePattern {
 public:
-	Pattern_T();
-	const std::vector<sf::Vector2i>& Pattern_T::getKickOffsets(int rotationIndex) const override;
-	sf::Color getColor() const override;
+    /**
+     * @brief Constructs the T pattern with defined rotations and pivot.
+     */
+    Pattern_T();
 
-private:
+    /**
+     * @brief Returns wall kick offsets for the given rotation index.
+     */
+    const std::vector<sf::Vector2i>& getKickOffsets(int rotationIndex) const override;
+
+    /**
+     * @brief Returns the color of the T pattern (Magenta).
+     */
+    sf::Color getColor() const override;
 };
 
 #endif 

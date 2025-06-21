@@ -23,7 +23,6 @@ DisplayWindow::DisplayWindow(sf::Vector2f position, sf::Vector2f size, const std
 
     m_valueText.setCharacterSize(36);
     m_valueText.setFillColor(sf::Color::Cyan);
-    //m_valueText.setPosition(sf::Vector2f(position.x + 8.f, position.y + 28.f));
 }
 
 void DisplayWindow::setValue(const std::string& value) {

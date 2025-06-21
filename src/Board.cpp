@@ -3,6 +3,7 @@
 
 Board::Board(sf::Vector2u windowSize)
 {
+	// Initialize the board grid with empty spaces
 	for (int i = 0; i < HEIGHT; i++)
 	{
 		for (int j = 0; j < WIDTH; j++)
@@ -47,8 +48,8 @@ void Board::draw(sf::RenderWindow& window, const int alpha) // alpha is for oppa
 std::set<int> Board::lockPiece(const CubePattern& piece)
 {
 	std::set<int> affectedRows;
-
 	auto currPos = piece.getPivot();
+
 	for (const auto& block : piece.getPatternPositions(currPos)) {
 		int row = block.y;
 		int col = block.x;
@@ -65,7 +66,7 @@ bool Board::checkCollision(const std::vector<sf::Vector2i>& positions)
 	for (const auto& pos : positions) {
 		int row = pos.y,
 			col = pos.x;
-		if (col < 0 || col >= WIDTH || /*row < 0 || */row >= HEIGHT)
+		if (col < 0 || col >= WIDTH || row >= HEIGHT)
 			return true;
 		if (row >= 0 && m_grid[row][col] != '_') // If occupied cell and the first specific edge case is for spawn + rotate  
 			return true;
@@ -83,7 +84,6 @@ void Board::updateBlockSize(sf::Vector2u windowSize) {
 	float boardHeight = windowSize.y;            // Use full height
 
 	m_blockSize = std::min(boardWidth / WIDTH, boardHeight / HEIGHT); // Scale blocks to fit
-
 	m_boardOffset = sf::Vector2f(0, 0);  // Board starts at (0,0), UI is on the right
 
 	m_blockShape.setSize(sf::Vector2f(m_blockSize, m_blockSize));
@@ -125,34 +125,6 @@ void Board::clear()
 		for (int j = 0; j < WIDTH; ++j)
 			m_grid[i][j] = '_';
 }
-
-//void Board::drawWithOpacity(sf::RenderWindow& window, const int alpha)
-//{
-//	for (int y = 0; y < HEIGHT; y++) {
-//		for (int x = 0; x < WIDTH; x++) {
-//			if (m_grid[y][x] != '_') {  // Draw only filled cells
-//				sf::Vector2f pos;
-//				pos.x = m_boardOffset.x + x * m_blockSize;
-//				pos.y = m_boardOffset.y + y * m_blockSize;
-//				m_blockShape.setPosition(pos);
-//
-//				// Set colors based on Tetrimino type
-//				switch (m_grid[y][x]) {
-//				case 'I': m_blockShape.setFillColor(sf::Color::Cyan); break;
-//				case 'O': m_blockShape.setFillColor(sf::Color::Yellow); break;
-//				case 'T': m_blockShape.setFillColor(sf::Color::Magenta); break;
-//				case 'S': m_blockShape.setFillColor(sf::Color::Green); break;
-//				case 'Z': m_blockShape.setFillColor(sf::Color::Red); break;
-//				case 'J': m_blockShape.setFillColor(sf::Color::Blue); break;
-//				case 'L': m_blockShape.setFillColor(sf::Color::White); break;
-//				default: m_blockShape.setFillColor(sf::Color::Black); break;
-//				}
-//
-//				window.draw(m_blockShape);
-//			}
-//		}
-//	}
-//}
 
 void Board::collapseLines(const std::set<int>& clearedRows)
 {

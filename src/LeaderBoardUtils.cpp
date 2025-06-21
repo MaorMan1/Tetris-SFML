@@ -6,9 +6,11 @@
 
 void loadScoresFromFile(const std::string& filePath, std::vector<ScoreEntry>& scores) {
     scores.clear();
+
     std::ifstream file(filePath);
     if (!file.is_open()) {
-        std::cerr << "Not opened";
+        std::cerr << "Failed to open score file: " << filePath << std::endl;
+        return;
     }
 
     std::string line;
@@ -30,12 +32,12 @@ void loadScoresFromFile(const std::string& filePath, std::vector<ScoreEntry>& sc
 void saveScoresToFile(const std::string& filePath, const std::vector<ScoreEntry>& scores) {
     std::ofstream file(filePath, std::ios::trunc);
     if (!file.is_open()) {
-        std::cerr << "Not opened";
+        std::cerr << "Failed to open score file for writing: " << filePath << std::endl;
+        return;
     }
 
-    //debugging
-    /*std::cout << "Current path: " << std::filesystem::current_path() << std::endl;*/
-
+    // Debugging tip: uncomment to check path
+    // std::cout << "Saving scores to: " << std::filesystem::absolute(filePath) << std::endl;
 
     for (const auto& entry : scores) {
         file << entry.name << ":" << entry.score << "\n";

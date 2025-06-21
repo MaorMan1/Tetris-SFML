@@ -19,8 +19,7 @@ GamePlayPage::GamePlayPage(sf::RenderWindow& window) :
     m_pauseText(ResourcesManager::get().getFont("main")),
     m_countdownActive(true),
     m_muted(false),
-    m_uiBar(window.getSize(), m_board.getBlockSize(), m_board.getOffset())/*,
-    m_mouseLeftHeld(false)*/
+    m_uiBar(window.getSize(), m_board.getBlockSize(), m_board.getOffset())
 {
     // Set hover mouse effect
     m_hoverCircle.setRadius(20.f); // Radius of the hover effect
@@ -219,7 +218,6 @@ void GamePlayPage::update(const sf::Time deltaTime, const sf::RenderWindow& wind
     m_shake.update(deltaTime);
     updateAnimations(deltaTime);
 
-    // check - Update score popups
     for (auto it = m_scorePopups.begin(); it != m_scorePopups.end(); ) {
         it->update(deltaTime);
         if (it->isFinished())
@@ -309,7 +307,6 @@ void GamePlayPage::handleGravity()
 
                 m_currentPiece.reset();
             }
-            //m_gravity.speedUp();
         }
     }
 
@@ -481,19 +478,6 @@ void GamePlayPage::drawCountdown(sf::RenderWindow& window)
         m_lastNumCounted = displayText;
         ResourcesManager::get().getSound(m_lastNumCounted).play();
     }
-    //sf::Text text(ResourcesManager::get().getFont("main"));
-    //text.setString(m_lastNumCounted);
-    //text.setCharacterSize(100);
-    //text.setFillColor(sf::Color::White);
-    //text.setOutlineColor(sf::Color::Red);
-    //text.setOutlineThickness(5);
-
-    //// Center the text
-    //sf::FloatRect bounds = text.getLocalBounds();
-    //text.setOrigin(sf::Vector2f(bounds.size.x / 2.f, bounds.size.y / 2.f));
-    //text.setPosition(sf::Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
-
-    //window.draw(text);
     sf::Text shadow(ResourcesManager::get().getFont("main"));
     sf::Text text(ResourcesManager::get().getFont("main"));
     text.setString(m_lastNumCounted);

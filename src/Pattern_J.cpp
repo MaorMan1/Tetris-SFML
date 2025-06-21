@@ -5,10 +5,10 @@ Pattern_J::Pattern_J()
     m_pivot = sf::Vector2i(WIDTH / 2 - 1, 0);
     m_gridSign = 'J';
     m_rotations = {
-        { {-1, 0}, {0, 0}, {1, 0}, {1, 1} },
-        { {0, -1}, {0, 0}, {0, 1}, {-1, 1} },
-        { {-1, -1}, {-1, 0}, {0, 0}, {1, 0} },
-        { {0, -1}, {0, 0}, {0, 1}, {1, -1} }
+        { {-1, 0}, {0, 0}, {1, 0}, {1, 1} },    // 0°
+        { {0, -1}, {0, 0}, {0, 1}, {-1, 1} },   // 90°
+        { {-1, -1}, {-1, 0}, {0, 0}, {1, 0} },  // 180°
+        { {0, -1}, {0, 0}, {0, 1}, {1, -1} }    // 270°
     };
 }
 
@@ -19,6 +19,7 @@ const std::vector<sf::Vector2i>& Pattern_J::getKickOffsets(int rotationIndex) co
         { {0, 0}, {-1, 0}, {-2, 0}, {0, -1} }, // from rotation 2
         { {0, 0}, {1, 0}, {0, -1}, {0, -2} } // from rotation 3
     };
+
     return kicksPerRotation[rotationIndex % kicksPerRotation.size()];
 }
 

@@ -3,8 +3,14 @@
 
 int main()
 {
-    Game process;
-    process.run();
+    try {
+        Game process;
+        process.run();
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Fatal error: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }

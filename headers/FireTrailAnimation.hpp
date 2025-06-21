@@ -6,6 +6,18 @@
 #include "BaseAnimation.hpp"
 #include "ResourcesManager.hpp"
 
+/*
+ * FireTrailAnimation controls the animated flames shown beneath the falling piece
+ * when the player holds the Down key. Frames 0–4 progress sequentially, then loop between 3–4.
+ *
+ * Usage:
+ *   - Call start(position) to trigger flames.
+ *   - Call stop() to deactivate.
+ *   - Call update(dt) each frame with delta time.
+ *   - Call draw() in your render loop.
+ *
+ * Requires: fire_trail.png loaded in ResourcesManager with correct coordinates.
+ */
 class FireTrailAnimation : public BaseAnimation {
 public:
     FireTrailAnimation();

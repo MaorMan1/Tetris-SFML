@@ -2,10 +2,10 @@
 
 Pattern_O::Pattern_O()
 {
-    m_pivot = sf::Vector2i(WIDTH / 2 - 1, 1); // Start near the top-middle
+    m_pivot = sf::Vector2i(WIDTH / 2 - 1, 1); // Top-middle spawn
     m_gridSign = 'O';
 
-    // Only one rotation state for 'O'
+    // O-shape does not rotate, so we define only one state
     m_rotations = {
         { {0, -1}, {0, 0}, {1, 0}, {1, -1} }
     };
@@ -13,7 +13,7 @@ Pattern_O::Pattern_O()
 
 const std::vector<sf::Vector2i>& Pattern_O::getKickOffsets(int rotationIndex) const {
     static const std::vector<std::vector<sf::Vector2i>> kicksPerRotation = {
-        { {0, 0} }  // From rotation 0
+        { {0, 0} }  // No movement needed on rotate
     };
     return kicksPerRotation[rotationIndex % kicksPerRotation.size()];
 }

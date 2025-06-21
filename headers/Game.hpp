@@ -5,10 +5,14 @@
 #include "AboutPage.hpp"
 #include "Pattern_I.hpp"
 
+/**
+* General class that runs and manages all program
+**/
 class Game {
 public:
 	void run();
-	
+    ~Game(); // ensure graceful cleanup if needed in the future
+
 private:
     void handlePageSwitching(sf::RenderWindow& window, const sf::Time deltaTime);
     void loadResources();

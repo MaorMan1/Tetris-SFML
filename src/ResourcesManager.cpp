@@ -7,6 +7,7 @@ ResourcesManager& ResourcesManager::get()
 	return instance;
 }
 
+// Fonts
 void ResourcesManager::loadFont(const std::string& name, const std::string& path)
 {
     sf::Font font;
@@ -21,6 +22,7 @@ sf::Font& ResourcesManager::getFont(const std::string& name)
     return m_fonts.at(name); // Catches mistakes if not exists
 }
 
+// Music
 void ResourcesManager::loadMusic(const std::string& name, const std::string& path)
 {
     auto music = std::make_unique<sf::Music>();
@@ -38,6 +40,7 @@ sf::Music& ResourcesManager::getMusic(const std::string& name)
     return *it->second;
 }
 
+// Sounds
 void ResourcesManager::loadSound(const std::string& name, const std::string& path)
 {
     sf::SoundBuffer buffer;
@@ -50,7 +53,7 @@ void ResourcesManager::loadSound(const std::string& name, const std::string& pat
 
     // Create the sf::Sound and set its buffer
     auto sound = std::make_unique<sf::Sound>(m_soundBuffers[name]);
-    //sound->setBuffer(m_soundBuffers[name]);
+    
     // Store the sf::Sound
     m_sounds[name] = std::move(sound);
 }
@@ -62,10 +65,9 @@ sf::Sound& ResourcesManager::getSound(const std::string& name)
         throw std::runtime_error("Sound not found: " + name);
     }
     return *it->second;
-    // Later...
-    //ResourcesManager::get().getSound("click").play();
 }
 
+// Textures
 void ResourcesManager::loadTexture(const std::string& name, const std::string& path)
 {
     sf::Texture texture;

@@ -6,7 +6,7 @@ void GravityTimer::start(float seconds)
     m_clock.restart();
 }
 
-bool GravityTimer::shouldFall(){
+bool GravityTimer::shouldFall() const{
     return m_clock.getElapsedTime().asSeconds() >= m_delay;
 }
 

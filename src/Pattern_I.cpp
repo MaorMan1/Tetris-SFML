@@ -15,6 +15,7 @@ const std::vector<sf::Vector2i>& Pattern_I::getKickOffsets(int rotationIndex) co
             { {0, 0}, {0, -1}, {0, -2} }, // from rotation 0
             { {0, 0}, {1, 0}, {-1, 0}, {-2, 0} }, // from rotation 1
     };
+
     return kicksPerRotation[rotationIndex % kicksPerRotation.size()];
 }
 

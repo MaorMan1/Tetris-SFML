@@ -1,5 +1,6 @@
 #ifndef TETRIS_RESOURCESMANAGER_HPP
 #define TETRIS_RESOURCESMANAGER_HPP
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <SFML/Audio.hpp>
@@ -9,35 +10,40 @@
 #include "DelayTimer.hpp"
 #include "Globals.hpp"
 
+/**
+ * @class ResourcesManager
+ * @brief Singleton that manages loading and accessing textures, fonts, sounds, and music.
+ */
 class ResourcesManager {
 public:
-    static ResourcesManager& get();  // Singleton access
+    /**
+     * @brief Returns the singleton instance of the ResourcesManager.
+     */
+    static ResourcesManager& get();
 
-    // Fonts
+    // Font Management
     void loadFont(const std::string& name, const std::string& path);
     sf::Font& getFont(const std::string& name);
 
-    // Long music
+    // Music Management
     void loadMusic(const std::string& name, const std::string& path);
     sf::Music& getMusic(const std::string& name);
 
-    // Sound Effects
+    // Sound Effects Management
     void loadSound(const std::string& name, const std::string& path);
-    sf::Sound& getSound(const std::string& name); // - TODO
+    sf::Sound& getSound(const std::string& name);
 
-    // Textures
+    // Texture Management
     void loadTexture(const std::string& name, const std::string& path);
     sf::Texture& getTexture(const std::string& name);
 
 private:
-    // Private constructor = Singleton
+    // Singleton Pattern
     ResourcesManager() = default;
-
-    // Prevent copying
     ResourcesManager(const ResourcesManager&) = delete;
     ResourcesManager& operator=(const ResourcesManager&) = delete;
 
-    // Storage
+    // Resource Containers
     std::unordered_map<std::string, sf::Font> m_fonts;
     std::unordered_map<std::string, std::unique_ptr<sf::Music>> m_music;
     std::unordered_map<std::string, sf::SoundBuffer> m_soundBuffers; // Holds the data - effects:

@@ -14,20 +14,15 @@ void UIButton::draw(sf::RenderWindow& window, const int alpha) const
 	window.draw(sprite);
 }
 
-void UIButton::update()
-{
-	m_sprite.setTextureRect(m_buttonStatus[static_cast<int>(m_currentStatus)]);
-	// ??
-
-	/*if (!isClicked(mousePos))
-		return;*/
-
+void UIButton::update() {
+	// Sync sprite texture rect with current status
+	if (!m_buttonStatus.empty())
+		m_sprite.setTextureRect(m_buttonStatus[static_cast<int>(m_currentStatus)]);
 }
 
-bool UIButton::isClicked(const sf::Vector2f& mousePos) const
-{
-	// ??
-	return true;
+bool UIButton::isClicked(const sf::Vector2f& mousePos) const {
+	// (Not used)This can be extended later for fine-grain input logic
+	return m_sprite.getGlobalBounds().contains(mousePos);
 }
 
 void UIButton::setHeldClicked(const bool isClicked)

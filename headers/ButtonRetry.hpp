@@ -6,10 +6,15 @@
 #include "UIButton.hpp"
 #include "Globals.hpp"
 
-class ButtonRetry: public UIButton {
+// Button to restart the current level or game
+class ButtonRetry : public UIButton {
 public:
     ButtonRetry();
+
+    // Trigger retry logic
     Button onClick() override;
+
+    // Reset button to default visual state
     void reset() override;
 };
 

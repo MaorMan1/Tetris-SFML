@@ -11,10 +11,7 @@ void CubePattern::moveLeft(Board& board) {
 
 void CubePattern::moveRight(Board& board) {
     sf::Vector2i nextStep(m_pivot.x + 1, m_pivot.y);
-    auto nextPatternPos = this->getPatternPositions(nextStep);/*
-    for (auto x : nextPatternPos) {
-        cout << x.y << " " << x.x << endl;
-    }*/
+    auto nextPatternPos = this->getPatternPositions(nextStep);
     if (!board.checkCollision(nextPatternPos)) {
         m_pivot.x++;  // Move right in the grid
     }

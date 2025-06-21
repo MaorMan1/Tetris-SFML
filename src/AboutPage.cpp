@@ -5,7 +5,6 @@ AboutPage::AboutPage(sf::RenderWindow& window):
     m_font(ResourcesManager::get().getFont("main")),
     m_aboutBGSprite(ResourcesManager::get().getTexture("about_bg_pic"))
 {
-    //m_backToMenu = false;
     //scaling bg to window size
     sf::Vector2f scale = { static_cast<float>(window.getSize().x) / static_cast<float>(m_aboutBGSprite.getTexture().getSize().x),
         static_cast<float>(window.getSize().y) / static_cast<float>(m_aboutBGSprite.getTexture().getSize().y) };
@@ -15,7 +14,7 @@ AboutPage::AboutPage(sf::RenderWindow& window):
     sf::Text description(m_font);
     sf::Text backButton(m_font);
 
-
+    // Title
     title.setString("About This Game:");
     title.setCharacterSize(40);
     title.setFillColor(sf::Color::Cyan);
@@ -26,7 +25,7 @@ AboutPage::AboutPage(sf::RenderWindow& window):
     sf::Vector2f pos = { x, 100 };
     title.setPosition(pos); // centered-ish
 
-    //description setup
+    // Description setup
     description.setString(
         "Tetris Remake by Maor Man\n"
         "Built with C++ and SFML.\n"
@@ -46,7 +45,7 @@ AboutPage::AboutPage(sf::RenderWindow& window):
     pos = { x, 200 };
     description.setPosition(pos);
 
-    //back button setup
+    // Back button setup
     backButton.setString("<< Back to Menu");
     backButton.setCharacterSize(30);
     backButton.setFillColor(sf::Color::White);
@@ -67,8 +66,6 @@ void AboutPage::handleEvent(const sf::Event& event, const sf::RenderWindow& wind
     if (event.is<sf::Event::MouseMoved>()) {
         sf::Vector2i mouseP = sf::Mouse::getPosition(window);
         sf::Vector2f mousePos(static_cast<float>(mouseP.x), static_cast<float>(mouseP.y));
-        //std::cout << mousePos.x << " " << mousePos.y << std::endl;
-
         if (backButton.getGlobalBounds().contains(mousePos)) {
             m_hoverBack = true; 
             backButton.setFillColor(sf::Color::Yellow);
@@ -84,8 +81,6 @@ void AboutPage::handleEvent(const sf::Event& event, const sf::RenderWindow& wind
         const auto& mouseEvent = event.getIf<sf::Event::MouseButtonPressed>();
         if (mouseEvent->button == sf::Mouse::Button::Left && m_hoverBack)
             m_backToMenu = true;
-        /*else
-            m_backToMenu = false;*/
     }
 }
 
