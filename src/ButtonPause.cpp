@@ -16,7 +16,7 @@ ButtonPause::ButtonPause():
     m_buttonStatus = m_pauseSprites;
     m_sprite.setTextureRect(m_buttonStatus[static_cast<int>(ButtonStatus::Normal)]);
 }
-
+//sasadsaa
 Button ButtonPause::onClick()
 {
     m_buttonStatus = (m_paused) ? m_pauseSprites: m_playSprites;    // Change Play/Pause sprites

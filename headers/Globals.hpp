@@ -21,7 +21,8 @@ const int UI_WIDTH = 150; ///< Width (in pixels) of the right-side UI bar
 
 // ====== Score File Path ======
 // NOTE: Adjust this path based on your actual working directory if needed
-const std::string SCORESFILE = "../../../resources/scores.txt";
+//const std::string SCORESFILE = "../../../resources/scores.txt";   // for debug
+const std::string SCORESFILE = "resources/scores.txt"; // for exe file
 
 // ====== Game Pattern Types ======
 enum class Patterns {

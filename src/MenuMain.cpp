@@ -89,9 +89,9 @@ void MenuMain::handleEvent(const sf::Event& event, const sf::RenderWindow& windo
     if (event.is<sf::Event::MouseButtonPressed>()) {
         const auto& mouseEvent = event.getIf<sf::Event::MouseButtonPressed>();
         if (mouseEvent->button == sf::Mouse::Button::Left) {
+            ResourcesManager::get().getSound("mouse_click").play();
             for (auto& option : m_menuOptions) {
                 if (option.getGlobalBounds().contains(mousePos)) {
-                    ResourcesManager::get().getSound("mouse_click").play();
                     option.setFillColor(sf::Color(205, 92, 92)); // Click color
                     m_pendingClick = option.getString();         // Save label for release
                     break;
