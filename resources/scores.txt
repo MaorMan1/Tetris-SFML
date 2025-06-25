@@ -1,5 +1,5 @@
 MM:5000
-MaorMan:3100
-JJ:3000
-llo:2800
-NewPlayer:1000
+MaorMan:300
+JJ:300
+llo:200
+NewPlayer:100
